@@ -27,7 +27,6 @@ def user_out(row) -> UserOut:
         id=row["id"],
         email=row["email"],
         name=row["name"],
-        role=row["role"],
         created_at=row["created_at"],
         last_login_at=row["last_login_at"],
     )
@@ -36,7 +35,7 @@ def user_out(row) -> UserOut:
 async def _issue_token(pool, row, request: Request) -> TokenOut:
     await pool.execute("UPDATE users SET last_login_at = now() WHERE id = $1", row["id"])
     await log_action(pool, row["id"], "login", ip=client_ip(request))
-    return TokenOut(access_token=create_token(row["id"], row["role"]), user=user_out(row))
+    return TokenOut(access_token=create_token(row["id"]), user=user_out(row))
 
 
 @router.post("/register", response_model=TokenOut, status_code=status.HTTP_201_CREATED)
@@ -46,21 +45,17 @@ async def register(body: RegisterIn, pool: PoolDep, request: Request) -> TokenOu
     exists = await pool.fetchval("SELECT 1 FROM users WHERE lower(email) = lower($1)", body.email)
     if exists:
         raise HTTPException(status.HTTP_409_CONFLICT, "Пользователь с такой почтой уже есть")
-    # первый пользователь системы становится администратором
-    first = await pool.fetchval("SELECT count(*) = 0 FROM users")
-    role = "admin" if first else settings.default_role
     row = await pool.fetchrow(
         """
-        INSERT INTO users(email, password_hash, name, role)
-        VALUES (lower($1), $2, $3, $4)
+        INSERT INTO users(email, password_hash, name)
+        VALUES (lower($1), $2, $3)
         RETURNING *
         """,
         body.email,
         hash_password(body.password),
         body.name or body.email.split("@")[0],
-        role,
     )
-    await log_action(pool, row["id"], "register", details={"role": role}, ip=client_ip(request))
+    await log_action(pool, row["id"], "register", ip=client_ip(request))
     return await _issue_token(pool, row, request)
 
 

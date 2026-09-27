@@ -20,11 +20,10 @@ export default function Layout() {
           </NavLink>
           <NavLink to="/list">Список</NavLink>
           <NavLink to="/events">События</NavLink>
-          {user?.role !== 'driver' && <NavLink to="/claim">Добавить</NavLink>}
-          {user?.role === 'admin' && <NavLink to="/admin">Админ</NavLink>}
+          <NavLink to="/claim">Добавить</NavLink>
         </nav>
         <NavLink to="/profile" className="small muted">
-          {user?.name || user?.email} · {roleLabel(user?.role)}
+          {user?.name || user?.email}
         </NavLink>
         <button className="small" onClick={logout}>
           Выйти
@@ -35,8 +34,4 @@ export default function Layout() {
       </main>
     </div>
   )
-}
-
-export function roleLabel(role) {
-  return { admin: 'администратор', dispatcher: 'диспетчер', driver: 'водитель' }[role] || role
 }

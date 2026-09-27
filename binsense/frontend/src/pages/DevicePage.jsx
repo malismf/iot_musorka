@@ -15,6 +15,7 @@ import EventIcon from '../components/EventIcon'
 import MapPicker from '../components/MapPicker'
 import { api } from '../lib/api'
 import {
+  deleteDeviceQuestion,
   fillColor,
   fillLabel,
   formatDateTime,
@@ -25,20 +26,16 @@ import { useApp } from '../lib/store'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler)
 
-const RANGES = [
-  { key: 24, bucket: '5m', title: 'Сутки' },
-  { key: 24 * 7, bucket: '1h', title: 'Неделя' },
-  { key: 24 * 30, bucket: '1d', title: 'Месяц' },
-]
+// История за последние сутки, точки усреднены по 5 минут
+const HISTORY = { hours: 24, bucket: '5m' }
 
 export default function DevicePage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { devices, publicConfig, toast, refreshAll, user } = useApp()
+  const { devices, publicConfig, toast, refreshAll } = useApp()
   const [device, setDevice] = useState(null)
   const [points, setPoints] = useState([])
   const [events, setEvents] = useState([])
-  const [range, setRange] = useState(RANGES[0])
   const [error, setError] = useState('')
 
   const live = devices.find((d) => d.id === id)
@@ -61,10 +58,10 @@ export default function DevicePage() {
   }, [load])
 
   useEffect(() => {
-    api(`/devices/${id}/telemetry`, { params: { hours: range.key, bucket: range.bucket } })
+    api(`/devices/${id}/telemetry`, { params: HISTORY })
       .then(setPoints)
       .catch((err) => setError(err.message))
-  }, [id, range])
+  }, [id])
 
   // живые данные из WebSocket подмешиваем в карточку
   useEffect(() => {
@@ -136,21 +133,7 @@ export default function DevicePage() {
         </div>
 
         <div className="card">
-          <div className="row" style={{ marginBottom: 8 }}>
-            <h2 style={{ margin: 0 }}>История</h2>
-            <div className="spacer" />
-            <div className="tabs" style={{ margin: 0 }}>
-              {RANGES.map((item) => (
-                <button
-                  key={item.key}
-                  className={range.key === item.key ? 'active small' : 'small'}
-                  onClick={() => setRange(item)}
-                >
-                  {item.title}
-                </button>
-              ))}
-            </div>
-          </div>
+          <h2>История за сутки</h2>
           <div className="chart-box">
             <Line
               options={chartOptions}
@@ -175,7 +158,6 @@ export default function DevicePage() {
 
       <SettingsCard
         device={device}
-        canEdit={user?.role !== 'driver'}
         center={publicConfig?.map_center}
         onSaved={(updated) => {
           const sent = updated.config_version !== device.config_version
@@ -183,9 +165,9 @@ export default function DevicePage() {
           toast(sent ? 'Сохранено, новые настройки отправлены устройству' : 'Сохранено')
           refreshAll().catch(() => {})
         }}
-        onUnclaimed={() => {
-          toast('Устройство отвязано')
-          navigate('/')
+        onDeleted={() => {
+          toast(`Устройство «${device.name || device.id}» удалено`)
+          navigate('/list')
         }}
       />
 
@@ -219,7 +201,8 @@ function Row({ label, children }) {
   )
 }
 
-function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
+function SettingsCard({ device, center, onSaved, onDeleted }) {
+  const { deleteDevice } = useApp()
   const [form, setForm] = useState(() => ({
     name: device.name || '',
     address: device.address || '',
@@ -279,10 +262,17 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
     }
   }
 
-  const unclaim = async () => {
-    if (!window.confirm('Отвязать устройство? Историю это не удалит.')) return
-    await api(`/devices/${device.id}/claim`, { method: 'DELETE' })
-    onUnclaimed()
+  const remove = async () => {
+    if (!window.confirm(deleteDeviceQuestion(device))) return
+    setBusy(true)
+    setError('')
+    try {
+      await deleteDevice(device.id)
+      onDeleted()
+    } catch (err) {
+      setError(err.message)
+      setBusy(false)
+    }
   }
 
   return (
@@ -292,36 +282,36 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
         <div>
           <label className="field">
             <span>Название</span>
-            <input value={form.name} onChange={change('name')} disabled={!canEdit} />
+            <input value={form.name} onChange={change('name')} />
           </label>
           <label className="field">
             <span>Адрес</span>
-            <input value={form.address} onChange={change('address')} disabled={!canEdit} />
+            <input value={form.address} onChange={change('address')} />
           </label>
           <div className="row">
             <label className="field" style={{ flex: 1 }}>
               <span>Глубина (0%), см</span>
-              <input type="number" value={form.empty_cm} onChange={change('empty_cm')} disabled={!canEdit} />
+              <input type="number" value={form.empty_cm} onChange={change('empty_cm')} />
             </label>
             <label className="field" style={{ flex: 1 }}>
               <span>Порог 100%, см</span>
-              <input type="number" value={form.full_cm} onChange={change('full_cm')} disabled={!canEdit} />
+              <input type="number" value={form.full_cm} onChange={change('full_cm')} />
             </label>
           </div>
           <div className="row">
             <label className="field" style={{ flex: 1 }}>
               <span>Порог «заполнен», %</span>
-              <input type="number" value={form.full_pct} onChange={change('full_pct')} disabled={!canEdit} />
+              <input type="number" value={form.full_pct} onChange={change('full_pct')} />
             </label>
             <label className="field" style={{ flex: 1 }}>
               <span>Порог отправки, %</span>
-              <input type="number" value={form.delta_pct} onChange={change('delta_pct')} disabled={!canEdit} />
+              <input type="number" value={form.delta_pct} onChange={change('delta_pct')} />
             </label>
           </div>
           <div className="row">
             <label className="field" style={{ flex: 1 }}>
               <span>Интервал, с</span>
-              <input type="number" value={form.interval_s} onChange={change('interval_s')} disabled={!canEdit} />
+              <input type="number" value={form.interval_s} onChange={change('interval_s')} />
             </label>
             <label className="field" style={{ flex: 1 }}>
               <span>Когда заполнен, с</span>
@@ -329,7 +319,6 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
                 type="number"
                 value={form.full_interval_s}
                 onChange={change('full_interval_s')}
-                disabled={!canEdit}
               />
             </label>
             <label className="field" style={{ flex: 1 }}>
@@ -338,7 +327,6 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
                 type="number"
                 value={form.heartbeat_s}
                 onChange={change('heartbeat_s')}
-                disabled={!canEdit}
               />
             </label>
           </div>
@@ -350,15 +338,13 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
       </div>
       {error && <div className="error">{error}</div>}
       <div className="row" style={{ marginTop: 10 }}>
-        <button className="primary" type="submit" disabled={busy || !canEdit}>
+        <button className="primary" type="submit" disabled={busy}>
           {busy ? 'Сохраняю…' : 'Сохранить'}
         </button>
         <div className="spacer" />
-        {canEdit && (
-          <button type="button" className="danger" onClick={unclaim}>
-            Отвязать устройство
-          </button>
-        )}
+        <button type="button" className="danger" onClick={remove} disabled={busy}>
+          Удалить устройство
+        </button>
       </div>
     </form>
   )

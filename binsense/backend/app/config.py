@@ -23,7 +23,6 @@ class Settings(BaseSettings):
     jwt_ttl_hours: int = 168                      # 7 дней
     admin_email: str = ""                         # создаётся при старте, если задан
     admin_password: str = ""
-    default_role: str = "dispatcher"              # роль при самостоятельной регистрации
     allow_registration: bool = True
 
     # --- MQTT ----------------------------------------------------------------

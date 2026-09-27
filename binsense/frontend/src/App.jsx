@@ -2,7 +2,6 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-route
 import Layout from './components/Layout'
 import Toasts from './components/Toasts'
 import { useApp } from './lib/store'
-import AdminPage from './pages/AdminPage'
 import ClaimPage from './pages/ClaimPage'
 import DevicePage from './pages/DevicePage'
 import EventsPage from './pages/EventsPage'
@@ -39,7 +38,6 @@ export default function App() {
           <Route path="claim" element={<ClaimPage />} />
           <Route path="events" element={<EventsPage />} />
           <Route path="profile" element={<ProfilePage />} />
-          <Route path="admin" element={<AdminPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

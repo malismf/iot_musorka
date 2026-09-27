@@ -55,11 +55,10 @@ def verify_password(password: str, stored: str) -> bool:
 
 
 # --- JWT ---------------------------------------------------------------------
-def create_token(user_id: int, role: str) -> str:
+def create_token(user_id: int) -> str:
     now = dt.datetime.now(dt.timezone.utc)
     payload = {
         "sub": str(user_id),
-        "role": role,
         "iat": int(now.timestamp()),
         "exp": int((now + dt.timedelta(hours=settings.jwt_ttl_hours)).timestamp()),
     }

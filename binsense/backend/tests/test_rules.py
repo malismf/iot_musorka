@@ -102,10 +102,9 @@ def test_claim_codes():
 
 
 def test_jwt():
-    token = create_token(7, "admin")
+    token = create_token(7)
     payload = decode_token(token)
     assert payload["sub"] == "7"
-    assert payload["role"] == "admin"
 
 
 def test_config_payload_fields():

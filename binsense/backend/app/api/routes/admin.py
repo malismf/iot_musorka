@@ -7,8 +7,8 @@ from fastapi import APIRouter, HTTPException, Query, Request, status
 
 from ...devices import log_action, provision_device
 from ...mqtt import mqtt_admin
-from ...schemas import AuditOut, ProvisionIn, ProvisionOut, RoleUpdateIn, UserOut
-from ..deps import AdminDep, PoolDep, client_ip
+from ...schemas import AuditOut, ProvisionIn, ProvisionOut, UserOut
+from ..deps import PoolDep, UserDep, client_ip
 from .auth import user_out
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 @router.post("/devices", response_model=ProvisionOut, status_code=status.HTTP_201_CREATED)
 async def provision(
-    body: ProvisionIn, pool: PoolDep, user: AdminDep, request: Request
+    body: ProvisionIn, pool: PoolDep, user: UserDep, request: Request
 ) -> ProvisionOut:
     """«Заводская» подготовка устройства: учётка MQTT + код привязки.
 
@@ -34,7 +34,7 @@ async def provision(
 
 @router.delete("/devices/{device_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_device(
-    device_id: str, pool: PoolDep, user: AdminDep, request: Request
+    device_id: str, pool: PoolDep, user: UserDep, request: Request
 ) -> None:
     device_id = device_id.lower()
     exists = await pool.fetchval("SELECT 1 FROM devices WHERE id = $1", device_id)
@@ -50,31 +50,13 @@ async def delete_device(
 
 
 @router.get("/users", response_model=list[UserOut])
-async def list_users(pool: PoolDep, user: AdminDep) -> list[UserOut]:
+async def list_users(pool: PoolDep, user: UserDep) -> list[UserOut]:
     rows = await pool.fetch("SELECT * FROM users ORDER BY id")
     return [user_out(r) for r in rows]
 
 
-@router.patch("/users/{user_id}", response_model=UserOut)
-async def update_role(
-    user_id: int, body: RoleUpdateIn, pool: PoolDep, user: AdminDep, request: Request
-) -> UserOut:
-    if user_id == user["id"] and body.role != "admin":
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Нельзя снять роль администратора с себя")
-    row = await pool.fetchrow(
-        "UPDATE users SET role = $2 WHERE id = $1 RETURNING *", user_id, body.role
-    )
-    if row is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Пользователь не найден")
-    await log_action(
-        pool, user["id"], "role_change", None,
-        {"user_id": user_id, "role": body.role}, ip=client_ip(request),
-    )
-    return user_out(row)
-
-
 @router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: int, pool: PoolDep, user: AdminDep, request: Request) -> None:
+async def delete_user(user_id: int, pool: PoolDep, user: UserDep, request: Request) -> None:
     if user_id == user["id"]:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Нельзя удалить самого себя")
     await pool.execute("DELETE FROM users WHERE id = $1", user_id)
@@ -84,7 +66,7 @@ async def delete_user(user_id: int, pool: PoolDep, user: AdminDep, request: Requ
 
 @router.get("/audit", response_model=list[AuditOut])
 async def audit(
-    pool: PoolDep, user: AdminDep, limit: Annotated[int, Query(ge=1, le=1000)] = 200
+    pool: PoolDep, user: UserDep, limit: Annotated[int, Query(ge=1, le=1000)] = 200
 ) -> list[AuditOut]:
     rows = await pool.fetch(
         """
@@ -100,7 +82,7 @@ async def audit(
 
 
 @router.get("/mqtt-clients", response_model=list[str])
-async def mqtt_clients(user: AdminDep) -> list[str]:
+async def mqtt_clients(user: UserDep) -> list[str]:
     """Список учётных записей в брокере — помогает при отладке доступа."""
     try:
         return await mqtt_admin.list_clients()

@@ -45,21 +45,8 @@ async def current_user(
     return user
 
 
+# Ролей нет: любой вошедший пользователь — администратор
 UserDep = Annotated[asyncpg.Record, Depends(current_user)]
-
-
-def require_roles(*roles: str):
-    async def checker(user: UserDep) -> asyncpg.Record:
-        if roles and user["role"] not in roles:
-            raise HTTPException(status.HTTP_403_FORBIDDEN, "Недостаточно прав")
-        return user
-
-    return checker
-
-
-AdminDep = Annotated[asyncpg.Record, Depends(require_roles("admin"))]
-# редактировать устройства могут админ и диспетчер, водитель — только смотреть и подтверждать
-EditorDep = Annotated[asyncpg.Record, Depends(require_roles("admin", "dispatcher"))]
 
 
 def client_ip(request: Request) -> Optional[str]:

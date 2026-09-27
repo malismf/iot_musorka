@@ -22,7 +22,6 @@ async def test_register_login_and_me(client):
         json={"email": "First@Example.com", "password": "password123", "name": "Первый"},
     )
     assert register.status_code == 201
-    assert register.json()["user"]["role"] == "admin"  # первый пользователь — администратор
     assert register.json()["user"]["email"] == "first@example.com"
 
     duplicate = await client.post(
@@ -35,7 +34,7 @@ async def test_register_login_and_me(client):
         "/api/auth/register",
         json={"email": "second@example.com", "password": "password123"},
     )
-    assert second.json()["user"]["role"] == "dispatcher"
+    assert second.status_code == 201
 
     login = await client.post(
         "/api/auth/login", json={"email": "first@example.com", "password": "password123"}
@@ -181,37 +180,57 @@ async def test_update_without_device_changes_keeps_version(client, device, fake_
     assert fake_mqtt.configs.get(device_id, {}) == published_before
 
 
-async def test_unclaim(client, device, fake_mqtt):
+async def test_delete_device(client, device, fake_mqtt, pool):
     device_id = device["device_id"]
-    response = await client.delete(f"/api/devices/{device_id}/claim")
-    assert response.status_code == 200
-    assert response.json()["status"] == "unclaimed"
-    assert fake_mqtt.configs[device_id]["claimed"] is False
+    await pool.execute(
+        "INSERT INTO events(device_id, type, severity, message) VALUES ($1, 'full', 'warning', 'x')",
+        device_id,
+    )
+    assert (await client.delete(f"/api/devices/{device_id}/claim")).status_code in (404, 405)
 
-    # неактивные устройства не попадают в общий список
-    listed = (await client.get("/api/devices")).json()
-    assert all(item["id"] != device_id for item in listed)
-    listed_all = (await client.get("/api/devices", params={"include_unclaimed": True})).json()
-    assert any(item["id"] == device_id for item in listed_all)
+    response = await client.delete(f"/api/admin/devices/{device_id}")
+    assert response.status_code == 204
+    assert (await client.get(f"/api/devices/{device_id}")).status_code == 404
+    # вместе с устройством пропадают его события, учётка MQTT и retained-настройки
+    assert await pool.fetchval("SELECT count(*) FROM events WHERE device_id = $1", device_id) == 0
+    assert device_id in fake_mqtt.deleted
+    assert device_id not in fake_mqtt.configs
 
 
-async def test_permissions_for_driver(client, device, pool):
+async def test_any_user_has_full_access(client, device):
+    # ролей нет: зарегистрированный пользователь может всё, что и администратор
     await client.post(
         "/api/auth/register",
-        json={"email": "driver@binsense.test", "password": "password123", "name": "Водитель"},
+        json={"email": "user@binsense.test", "password": "password123", "name": "Пользователь"},
     )
-    await pool.execute("UPDATE users SET role = 'driver' WHERE email = 'driver@binsense.test'")
     login = await client.post(
-        "/api/auth/login", json={"email": "driver@binsense.test", "password": "password123"}
+        "/api/auth/login", json={"email": "user@binsense.test", "password": "password123"}
     )
     headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
 
-    assert (await client.get("/api/devices", headers=headers)).status_code == 200
-    forbidden = await client.patch(
-        f"/api/devices/{device['device_id']}", json={"name": "Нельзя"}, headers=headers
+    updated = await client.patch(
+        f"/api/devices/{device['device_id']}", json={"name": "Можно"}, headers=headers
     )
-    assert forbidden.status_code == 403
-    assert (await client.get("/api/admin/users", headers=headers)).status_code == 403
+    assert updated.status_code == 200
+    assert (await client.get("/api/admin/users", headers=headers)).status_code == 200
+    assert (await client.get("/api/admin/audit", headers=headers)).status_code == 200
+
+
+async def test_clear_events(client, device, pool):
+    device_id = device["device_id"]
+    for kind in ("full", "offline"):
+        await pool.execute(
+            "INSERT INTO events(device_id, type, severity, message) VALUES ($1, $2, 'warning', 'x')",
+            device_id,
+            kind,
+        )
+    assert len((await client.get("/api/events")).json()) >= 2
+
+    response = await client.delete("/api/events")
+    assert response.status_code == 204
+    assert (await client.get("/api/events")).json() == []
+    audit = (await client.get("/api/admin/audit")).json()
+    assert any(row["action"] == "clear_events" for row in audit)
 
 
 async def test_events_ack_and_stats(client, device, pool):

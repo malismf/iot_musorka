@@ -39,8 +39,8 @@ async def ensure_admin_user(pool) -> None:
     if exists:
         return
     await pool.execute(
-        """INSERT INTO users(email, password_hash, name, role)
-           VALUES (lower($1), $2, 'Администратор', 'admin')""",
+        """INSERT INTO users(email, password_hash, name)
+           VALUES (lower($1), $2, 'Администратор')""",
         settings.admin_email,
         hash_password(settings.admin_password),
     )

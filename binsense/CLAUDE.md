@@ -44,7 +44,7 @@ cd frontend && npm install && npm run dev          # :5173, прокси на :8
 
 # тесты
 cd backend && TEST_DATABASE_URL=postgresql://binsense:ПАРОЛЬ@localhost:5432/binsense_test \
-    python -m pytest                               # 37 тестов, нужна живая БД
+    python -m pytest                               # 38 тестов, нужна живая БД
 cd firmware/hosttest && ./run.sh                   # 51 проверка + компиляция (CXX=… для не-g++)
 
 # без Docker на Windows (docs/LOCAL_TEST.md §3б): рантайм в %USERPROFILE%\binsense-run
@@ -54,6 +54,7 @@ powershell -ExecutionPolicy Bypass -File infra\windows\start.ps1   # stop.ps1 �
 # прошивка и подготовка платы (адрес брокера — MQTT_PUBLIC_HOST или --mqtt-host)
 cd firmware && pio run -e esp8266 -t upload && pio device monitor   # HC-SR04: esp8266_hcsr04
 python tools/provision.py --api https://localhost --port COM5 --flash
+python tools/console.py COM5                       # консоль платы (вместо pio device monitor)
 ```
 
 ## Архитектурные решения (не ломать, не «упрощать»)
@@ -138,7 +139,7 @@ python tools/provision.py --api https://localhost --port COM5 --flash
 
 Работает и проверено на локальном стенде: подготовка устройства → привязка по
 коду → retained-настройки → телеметрия → события → вывоз →
-история, маршрут, метрики. Прошло 37 тестов сервера,
+история, маршрут, метрики. Прошло 38 тестов сервера,
 51 проверка логики прошивки, сборка обоих вариантов прошивки настоящим
 тулчейном ESP8266 (PlatformIO), сборка фронтенда. Готовые образы — в
 `%USERPROFILE%\binsense-run\fw-release` на машине разработчика.
@@ -167,6 +168,19 @@ python tools/provision.py --api https://localhost --port COM5 --flash
   миграция `006_drop_urgent.sql`. Фильтр в ленте — «Контейнер заполнен».
 - Карта по умолчанию — Иркутск (`MAP_CENTER`, резерв — `DEFAULT_MAP_CENTER`
   в `frontend/src/lib/tiles.js`).
+- **Ролей нет** (миграция `007_single_role.sql`): любой вошедший пользователь —
+  администратор, в API везде `UserDep`. Регистрация открыта
+  (`ALLOW_REGISTRATION=true`), то есть любой зарегистрировавшийся получает
+  полный доступ.
+- В карточке только график за сутки (`HISTORY` в `DevicePage.jsx`); API
+  истории по-прежнему принимает `bucket=1h|1d`.
+- «Очистить события» — `DELETE /api/events`, рассылает по WebSocket
+  `events_cleared`, пишется в журнал действий.
+- Админ-панели в интерфейсе нет. Удаление контейнера — кнопка в «Списке» и в
+  карточке (`deleteDevice` в `store.jsx` → `DELETE /api/admin/devices/{id}`,
+  стирает и учётку MQTT). **Отвязки нет** — ни в интерфейсе, ни в API, событие
+  `unclaimed` не создаётся; перенос — сменой адреса и места в настройках. Пользователи и
+  журнал действий доступны только через API (`/api/admin/users`, `/api/admin/audit`).
 - Плитки OpenStreetMap требуют интернета; для закрытого контура адрес слоя
   меняется в `frontend/src/lib/tiles.js`.
 - Геолокация на странице привязки работает только по HTTPS (или на
@@ -177,5 +191,8 @@ python tools/provision.py --api https://localhost --port COM5 --flash
   WPA2-Enterprise); на Windows нужно правило брандмауэра для порта 1883.
 - `start.ps1` не запускайте с выводом в конвейер (`| Select-Object` и т. п.):
   сервисы наследуют канал, и команда не завершится.
+- Драйвер FTDI 2.12 с неоригинальным FT232 (плата D1 mini на стенде) копит
+  копии последней строки, пока COM-порт закрыт, и выдаёт мегабайты повторов
+  при открытии. Это не прошивка; `tools/console.py` выбрасывает накопленное.
 - Телеметрия хранится сырой; при большом числе устройств стоит включить
   TimescaleDB или агрегировать историю.

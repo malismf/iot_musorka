@@ -7,7 +7,7 @@ import { useApp } from '../lib/store'
 export default function ClaimPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
-  const { publicConfig, toast, refreshAll, user } = useApp()
+  const { publicConfig, toast, refreshAll } = useApp()
   const [deviceId, setDeviceId] = useState(params.get('id') || '')
   const [code, setCode] = useState((params.get('code') || '').toUpperCase())
   const [name, setName] = useState('')
@@ -50,10 +50,6 @@ export default function ClaimPage() {
     } finally {
       setBusy(false)
     }
-  }
-
-  if (user?.role === 'driver') {
-    return <div className="card">Добавлять устройства может администратор или диспетчер.</div>
   }
 
   return (

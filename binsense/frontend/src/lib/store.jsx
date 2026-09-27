@@ -76,6 +76,20 @@ export function AppProvider({ children }) {
     await Promise.all([refreshDevices(), refreshEvents(), refreshStats()])
   }, [refreshDevices, refreshEvents, refreshStats])
 
+  const deleteDevice = useCallback(
+    async (deviceId) => {
+      await api(`/admin/devices/${deviceId}`, { method: 'DELETE' })
+      await refreshAll()
+    },
+    [refreshAll],
+  )
+
+  const clearEvents = useCallback(async () => {
+    await api('/events', { method: 'DELETE' })
+    setEvents([])
+    refreshStats().catch(() => {})
+  }, [refreshStats])
+
   const upsertDevice = useCallback((device) => {
     setDevices((list) => {
       const index = list.findIndex((d) => d.id === device.id)
@@ -149,6 +163,8 @@ export function AppProvider({ children }) {
             toast(payload.event.message, payload.event.severity)
           }
           refreshStats().catch(() => {})
+        } else if (payload.type === 'events_cleared') {
+          setEvents([])
         }
       }
 
@@ -186,6 +202,8 @@ export function AppProvider({ children }) {
     refreshDevices,
     refreshEvents,
     refreshStats,
+    clearEvents,
+    deleteDevice,
     upsertDevice,
   }
 

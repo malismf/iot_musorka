@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { roleLabel } from '../components/Layout'
 import { api } from '../lib/api'
 import { useApp } from '../lib/store'
 
@@ -27,9 +26,7 @@ export default function ProfilePage() {
     <div className="grid cols-2">
       <form className="card" onSubmit={save}>
         <h1>Профиль</h1>
-        <p className="muted small">
-          {user?.email} · роль: {roleLabel(user?.role)}
-        </p>
+        <p className="muted small">{user?.email}</p>
         <label className="field">
           <span>Имя</span>
           <input value={name} onChange={(e) => setName(e.target.value)} />

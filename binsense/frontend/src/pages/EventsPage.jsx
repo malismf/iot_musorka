@@ -1,3 +1,4 @@
+import { Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import EventIcon from '../components/EventIcon'
@@ -10,13 +11,27 @@ const FILTERS = [
 ]
 
 export default function EventsPage() {
-  const { events } = useApp()
+  const { events, clearEvents, toast } = useApp()
   const [filter, setFilter] = useState('all')
+  const [busy, setBusy] = useState(false)
 
   const rows = useMemo(() => {
     if (filter === 'all') return events
     return events.filter((e) => e.type === filter)
   }, [events, filter])
+
+  const clear = async () => {
+    if (!window.confirm('Удалить все события? Это действие нельзя отменить.')) return
+    setBusy(true)
+    try {
+      await clearEvents()
+      toast('События очищены')
+    } catch (err) {
+      toast(err.message, 'warning')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <div className="card">
@@ -34,6 +49,14 @@ export default function EventsPage() {
             </button>
           ))}
         </div>
+        <button
+          className="small danger with-icon"
+          onClick={clear}
+          disabled={busy || events.length === 0}
+        >
+          <Trash2 size={14} aria-hidden="true" />
+          Очистить события
+        </button>
       </div>
 
       {rows.length === 0 && <p className="muted small">Событий нет</p>}

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import FillBar from '../components/FillBar'
-import { statusLabel, timeAgo } from '../lib/format'
+import { deleteDeviceQuestion, statusLabel, timeAgo } from '../lib/format'
 import { useApp } from '../lib/store'
 
 const COLUMNS = [
@@ -12,9 +12,10 @@ const COLUMNS = [
 ]
 
 export default function ListPage() {
-  const { devices } = useApp()
+  const { devices, deleteDevice, toast } = useApp()
   const [sort, setSort] = useState({ key: 'fill', desc: true })
   const [query, setQuery] = useState('')
+  const [deleting, setDeleting] = useState(null)
 
   const rows = useMemo(() => {
     const text = query.trim().toLowerCase()
@@ -33,6 +34,19 @@ export default function ListPage() {
       return va > vb ? factor : -factor
     })
   }, [devices, sort, query])
+
+  const remove = async (device) => {
+    if (!window.confirm(deleteDeviceQuestion(device))) return
+    setDeleting(device.id)
+    try {
+      await deleteDevice(device.id)
+      toast(`Устройство «${device.name || device.id}» удалено`)
+    } catch (err) {
+      toast(err.message, 'warning')
+    } finally {
+      setDeleting(null)
+    }
+  }
 
   return (
     <div className="card">
@@ -62,6 +76,7 @@ export default function ListPage() {
                   {sort.key === column.key ? (sort.desc ? ' ↓' : ' ↑') : ''}
                 </th>
               ))}
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -78,11 +93,20 @@ export default function ListPage() {
                 <td>
                   <span className={`badge ${badgeClass(device)}`}>{statusLabel(device)}</span>
                 </td>
+                <td style={{ textAlign: 'right' }}>
+                  <button
+                    className="small danger"
+                    onClick={() => remove(device)}
+                    disabled={deleting === device.id}
+                  >
+                    {deleting === device.id ? 'Удаляю…' : 'Удалить'}
+                  </button>
+                </td>
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={COLUMNS.length} className="muted">
+                <td colSpan={COLUMNS.length + 1} className="muted">
                   Ничего не найдено
                 </td>
               </tr>

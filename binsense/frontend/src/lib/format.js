@@ -6,7 +6,6 @@ import {
   Power,
   Ruler,
   TriangleAlert,
-  Unlink,
   Wifi,
   WifiOff,
   Wrench,
@@ -70,7 +69,6 @@ export const EVENT_TITLES = {
   sensor_error: 'Сбой датчика',
   calibrated: 'Калибровка',
   claimed: 'Устройство привязано',
-  unclaimed: 'Устройство отвязано',
   hello: 'Устройство включено',
 }
 
@@ -82,8 +80,15 @@ export const EVENT_ICONS = {
   sensor_error: { icon: Wrench, color: COLORS.full },
   calibrated: { icon: Ruler, color: COLORS.unknown },
   claimed: { icon: LinkIcon, color: COLORS.unknown },
-  unclaimed: { icon: Unlink, color: COLORS.offline },
   hello: { icon: Power, color: COLORS.offline },
+}
+
+export function deleteDeviceQuestion(device) {
+  return (
+    `Удалить «${device.name || device.id}» вместе с историей и событиями?\n\n` +
+    'Учётная запись устройства на сервере тоже удалится: плата перестанет ' +
+    'подключаться, пока её заново не подготовят через provision.py.'
+  )
 }
 
 export const DEFAULT_EVENT_ICON = { icon: Info, color: COLORS.unknown }

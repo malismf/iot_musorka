@@ -3,11 +3,9 @@ from __future__ import annotations
 
 import datetime as dt
 import re
-from typing import Annotated, Any, Literal, Optional
+from typing import Annotated, Any, Optional
 
 from pydantic import AfterValidator, BaseModel, Field, field_validator
-
-Role = Literal["admin", "dispatcher", "driver"]
 
 # Свой валидатор почты: email-validator запрещает внутренние домены вида .local,
 # а система часто разворачивается внутри организации.
@@ -89,7 +87,6 @@ class UserOut(BaseModel):
     id: int
     email: str
     name: str
-    role: Role
     created_at: Optional[dt.datetime] = None
     last_login_at: Optional[dt.datetime] = None
 
@@ -97,10 +94,6 @@ class UserOut(BaseModel):
 class MeUpdateIn(BaseModel):
     name: Optional[str] = Field(default=None, max_length=120)
     password: Optional[str] = Field(default=None, min_length=8, max_length=128)
-
-
-class RoleUpdateIn(BaseModel):
-    role: Role
 
 
 # --- Устройства --------------------------------------------------------------

@@ -26,7 +26,7 @@ from ...schemas import (
     TelemetryPoint,
 )
 from ...security import verify_claim_code
-from ..deps import EditorDep, PoolDep, UserDep, client_ip
+from ..deps import PoolDep, UserDep, client_ip
 
 router = APIRouter(prefix="/devices", tags=["devices"])
 
@@ -71,7 +71,7 @@ async def get_device(device_id: str, pool: PoolDep, user: UserDep) -> DeviceOut:
 
 
 @router.post("/claim", response_model=DeviceOut, status_code=status.HTTP_201_CREATED)
-async def claim_device(body: ClaimIn, pool: PoolDep, user: EditorDep, request: Request) -> DeviceOut:
+async def claim_device(body: ClaimIn, pool: PoolDep, user: UserDep, request: Request) -> DeviceOut:
     """Привязка устройства к аккаунту по коду привязки (его выдаёт tools/provision.py)."""
     row = await pool.fetchrow("SELECT * FROM devices WHERE id = $1", body.device_id)
     if row is None:
@@ -141,7 +141,7 @@ async def update_device(
     device_id: str,
     body: DeviceUpdateIn,
     pool: PoolDep,
-    user: EditorDep,
+    user: UserDep,
     request: Request,
 ) -> DeviceOut:
     device_id = device_id.lower()
@@ -177,40 +177,6 @@ async def update_device(
 
     await log_action(pool, user["id"], "update_device", device_id, patch, ip=client_ip(request))
     device = await fetch_device(pool, device_id)
-    out = device_to_out(device)
-    await broadcast(pool, {"type": "telemetry", "device": out.model_dump(mode="json")})
-    return out
-
-
-@router.delete("/{device_id}/claim", response_model=DeviceOut)
-async def unclaim_device(
-    device_id: str, pool: PoolDep, user: EditorDep, request: Request
-) -> DeviceOut:
-    """Отвязать устройство (например, чтобы перенести на другой контейнер)."""
-    device_id = device_id.lower()
-    row = await fetch_device(pool, device_id)
-    if row is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Устройство не найдено")
-    if user["role"] != "admin" and row["owner_id"] != user["id"]:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Отвязать может владелец или администратор")
-
-    await pool.execute(
-        """
-        UPDATE devices
-           SET status = 'unclaimed', owner_id = NULL, online = FALSE,
-               claimed_at = NULL, state = '{}'::jsonb
-         WHERE id = $1
-        """,
-        device_id,
-    )
-    await bump_config(pool, device_id)  # claimed = false
-    await log_action(pool, user["id"], "unclaim", device_id, ip=client_ip(request))
-    device = await fetch_device(pool, device_id)
-    await store_event(
-        pool,
-        device,
-        EventSpec(type="unclaimed", message=f"Устройство отвязано: {device_id}"),
-    )
     out = device_to_out(device)
     await broadcast(pool, {"type": "telemetry", "device": out.model_dump(mode="json")})
     return out

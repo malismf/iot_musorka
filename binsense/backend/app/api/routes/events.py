@@ -1,4 +1,4 @@
-"""Лента событий и подтверждение («Принято»)."""
+"""Лента событий, очистка и подтверждение."""
 from __future__ import annotations
 
 from typing import Annotated, Optional
@@ -46,6 +46,17 @@ async def list_events(
         *params,
     )
     return [EventOut(**dict(r)) for r in rows]
+
+
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT)
+async def clear_events(pool: PoolDep, user: UserDep, request: Request) -> None:
+    count = await pool.fetchval(
+        "WITH deleted AS (DELETE FROM events RETURNING 1) SELECT count(*) FROM deleted"
+    )
+    await log_action(
+        pool, user["id"], "clear_events", None, {"count": count}, ip=client_ip(request)
+    )
+    await broadcast(pool, {"type": "events_cleared"})
 
 
 @router.post("/{event_id}/ack", response_model=EventOut)
