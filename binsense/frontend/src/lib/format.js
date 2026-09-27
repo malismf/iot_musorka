@@ -50,13 +50,6 @@ export function formatDateTime(value) {
   })
 }
 
-export function formatDuration(hours) {
-  if (hours === null || hours === undefined) return '—'
-  if (hours < 1) return `${Math.round(hours * 60)} мин`
-  if (hours < 48) return `${hours.toFixed(1)} ч`
-  return `${Math.round(hours / 24)} дн`
-}
-
 export const EVENT_TITLES = {
   full: 'Контейнер заполнен',
   full_urgent: 'Срочно вывезти',

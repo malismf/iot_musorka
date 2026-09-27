@@ -149,7 +149,6 @@ async def public_config() -> PublicConfigOut:
     return PublicConfigOut(
         map_center=[lat, lon],
         map_zoom=settings.map_zoom,
-        bot_username=settings.telegram_bot_username.lstrip("@"),
         public_url=settings.public_url,
         allow_registration=settings.allow_registration,
         version=VERSION,

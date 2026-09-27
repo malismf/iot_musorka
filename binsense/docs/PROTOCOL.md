@@ -5,10 +5,9 @@
 | Участники | Протокол | Где описано |
 |---|---|---|
 | Устройство ↔ сервер | MQTT 3.1.1 поверх Wi-Fi, QoS 1 | этот файл, `docs/asyncapi.yaml` |
-| Датчик ↔ микроконтроллер | UART 9600 (A02YYUW / JSN-SR04T) | раздел 5 |
-| Периферия ↔ микроконтроллер | цифровой вход, ШИМ, АЦП | `hardware/WIRING.md` |
+| Датчик ↔ микроконтроллер | UART 9600 (A02YYUW / JSN-SR04T) | раздел 4 |
+| Периферия ↔ микроконтроллер | цифровой вход, ШИМ | `hardware/WIRING.md` |
 | Веб-приложение ↔ сервер | REST (HTTPS) + WebSocket | раздел 3, `docs/openapi.json`, `/api/docs` |
-| Сервер ↔ Telegram | HTTPS, Telegram Bot API | раздел 4 |
 | Grafana ↔ база | PostgreSQL wire protocol, роль только для чтения | `infra/grafana` |
 
 ---
@@ -116,9 +115,8 @@ Mosquitto работает с плагином dynamic-security. При подг
 
 ```
 mosquitto ──MQTT──► ingestor ──SQL──► PostgreSQL ◄──SQL── api ──HTTP/WS──► браузер
-                        │                  ▲                   ▲
-                        └──HTTPS──► Telegram│                   │
-                                            └── LISTEN/NOTIFY ──┘
+                                           │               ▲
+                                           └─LISTEN/NOTIFY─┘
 ```
 
 `ingestor` и `api` — разные процессы. Чтобы карта обновлялась мгновенно,
@@ -137,8 +135,7 @@ ingestor после записи телеметрии выполняет `pg_not
 | Метод | Назначение |
 |---|---|
 | `POST /auth/register`, `/auth/login` | регистрация и вход |
-| `GET /me`, `PATCH /me` | профиль и настройки уведомлений |
-| `POST /me/telegram-link` | одноразовая ссылка для привязки Telegram |
+| `GET /me`, `PATCH /me` | профиль: имя и пароль |
 | `GET /devices` | список устройств с последними значениями (для карты) |
 | `GET /devices/{id}` | карточка устройства |
 | `POST /devices/claim` | привязка по коду из `provision.py` |
@@ -153,7 +150,7 @@ ingestor после записи телеметрии выполняет `pg_not
 | `POST /admin/devices` | подготовка устройства (учётка MQTT + код привязки) |
 | `GET /admin/users`, `PATCH /admin/users/{id}` | пользователи и роли |
 | `GET /admin/audit` | журнал действий |
-| `GET /config/public` | центр карты, имя бота (доступно без авторизации) |
+| `GET /config/public` | центр карты (доступно без авторизации) |
 | `GET /health` | состояние сервиса |
 
 WebSocket: `wss://<домен>/api/ws?token=<JWT>`. Сервер присылает:
@@ -176,21 +173,7 @@ WebSocket: `wss://<домен>/api/ws?token=<JWT>`. Сервер присыла�
 
 ---
 
-## 4. Telegram
-
-Уведомления отправляет ingestor обычным HTTPS-запросом к Bot API
-(`sendMessage` с `inline_keyboard`), а команды и нажатия кнопок обрабатывает
-отдельный сервис `bot` на aiogram. Привязка чата к аккаунту — через
-одноразовый токен: приложение выдаёт ссылку `https://t.me/<bot>?start=<token>`,
-бот проверяет токен и сохраняет `chat_id`.
-
-Команды: `/status`, `/full`, `/bins`, `/events`, `/unlink`, `/help`.
-Кнопка «Принято» под уведомлением подтверждает событие тем же действием, что
-и кнопка в веб-приложении.
-
----
-
-## 5. Периферия и микроконтроллер
+## 4. Периферия и микроконтроллер
 
 | Устройство | Способ взаимодействия |
 |---|---|

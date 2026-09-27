@@ -67,10 +67,10 @@ if (-not (Test-Path -LiteralPath (Join-Path $P.PgData "PG_VERSION"))) {
 $env:PGPASSWORD = $cfg.POSTGRES_PASSWORD
 $startedHere = Start-Postgres $P
 try {
-    $exists = & (Join-Path $P.PgBin "psql.exe") -h 127.0.0.1 -p 5432 -U binsense -d postgres -tAc `
+    $exists = & (Join-Path $P.PgBin "psql.exe") -h 127.0.0.1 -p (Get-PgPort) -U binsense -d postgres -tAc `
         "SELECT 1 FROM pg_database WHERE datname = 'binsense'"
     if ("$exists".Trim() -ne "1") {
-        & (Join-Path $P.PgBin "createdb.exe") -h 127.0.0.1 -p 5432 -U binsense binsense
+        & (Join-Path $P.PgBin "createdb.exe") -h 127.0.0.1 -p (Get-PgPort) -U binsense binsense
         if ($LASTEXITCODE -ne 0) { throw "не удалось создать базу binsense" }
     }
 } finally {

@@ -22,7 +22,6 @@ TEST_DSN = os.environ.setdefault(
 os.environ.setdefault("DATABASE_URL", TEST_DSN)
 os.environ.setdefault("JWT_SECRET", "test-secret")
 os.environ.setdefault("PUBLIC_URL", "http://testserver")
-os.environ.setdefault("TELEGRAM_BOT_TOKEN", "")
 os.environ.setdefault("ADMIN_EMAIL", "")
 os.environ.setdefault("ADMIN_PASSWORD", "")
 os.environ.setdefault("API_METRICS", "false")
@@ -84,8 +83,8 @@ async def pool():
     async with pool.acquire() as conn:
         await conn.execute(
             """
-            TRUNCATE notifications, events, telemetry, device_metrics, api_requests,
-                     audit_log, device_config, devices, telegram_links, users
+            TRUNCATE events, telemetry, device_metrics, api_requests,
+                     audit_log, device_config, devices, users
             RESTART IDENTITY CASCADE
             """
         )

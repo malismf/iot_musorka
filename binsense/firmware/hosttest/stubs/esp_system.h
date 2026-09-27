@@ -1,4 +1,7 @@
+// Заглушка ESP-IDF: причина перезагрузки и аппаратный генератор случайных чисел.
 #pragma once
+
+#include <cstdint>
 
 typedef enum {
   ESP_RST_UNKNOWN,
@@ -15,3 +18,4 @@ typedef enum {
 } esp_reset_reason_t;
 
 esp_reset_reason_t esp_reset_reason();
+uint32_t esp_random();

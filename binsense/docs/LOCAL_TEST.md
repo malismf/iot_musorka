@@ -72,7 +72,7 @@ ipconfig
 
 Без интернета в этой сети стенд тоже работает: плата не синхронизирует время
 по NTP, и время замера ставит сервер. Не будут работать только плитки карты
-OpenStreetMap и Telegram.
+OpenStreetMap.
 
 ---
 
@@ -154,6 +154,11 @@ New-NetFirewallRule -DisplayName "BinSense web" -Direction Inbound `
 
 Сменился адрес ноутбука — повторите `setup.ps1 -HostAddress <новый адрес>`,
 перезапустите сервер и заново подготовьте плату.
+
+Порт 5432 занят уже установленной службой PostgreSQL (в `logs\postgres.log`
+будет `could not bind IPv4 address`) — впишите в `.env` свободный порт,
+например `PG_PORT=5433`, и повторите `setup.ps1`. Каталог запуска можно
+перенести на другой диск: `-RunDir Z:\binsense-run` у всех трёх скриптов.
 
 ---
 

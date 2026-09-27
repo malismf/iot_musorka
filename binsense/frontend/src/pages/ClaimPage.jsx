@@ -12,7 +12,6 @@ export default function ClaimPage() {
   const [code, setCode] = useState((params.get('code') || '').toUpperCase())
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
-  const [volume, setVolume] = useState('1100')
   const [position, setPosition] = useState(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -41,7 +40,6 @@ export default function ClaimPage() {
           address,
           lat: position ? position[0] : null,
           lon: position ? position[1] : null,
-          volume_l: volume ? Number(volume) : null,
         },
       })
       toast('Устройство привязано')
@@ -97,17 +95,6 @@ export default function ClaimPage() {
             onChange={(e) => setAddress(e.target.value)}
             placeholder="ул. Ленина, 4"
           />
-        </label>
-        <label className="field">
-          <span>Объём контейнера, л</span>
-          <select value={volume} onChange={(e) => setVolume(e.target.value)}>
-            <option value="120">120</option>
-            <option value="240">240</option>
-            <option value="660">660</option>
-            <option value="770">770</option>
-            <option value="1100">1100</option>
-            <option value="8000">8000 (бункер)</option>
-          </select>
         </label>
 
         {error && <div className="error">{error}</div>}

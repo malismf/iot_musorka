@@ -1,12 +1,10 @@
-"""Запись событий в базу, рассылка в Telegram и в WebSocket."""
+"""Запись событий в базу и рассылка в WebSocket."""
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from .db import notify as pg_notify
-from .notify import TelegramClient, notify_event
-from .rules import AUDIENCE, EventSpec
+from .rules import EventSpec
 
 log = logging.getLogger("binsense.events")
 
@@ -21,12 +19,7 @@ async def broadcast(pool, payload: dict) -> None:
         log.warning("не удалось разослать событие в WebSocket: %s", exc)
 
 
-async def store_event(
-    pool,
-    device,
-    spec: EventSpec,
-    telegram: Optional[TelegramClient] = None,
-) -> int:
+async def store_event(pool, device, spec: EventSpec) -> int:
     device_id = device["id"] if device is not None else None
     async with pool.acquire() as conn:
         async with conn.transaction():
@@ -72,23 +65,6 @@ async def store_event(
             },
         },
     )
-
-    if telegram is not None:
-        try:
-            await notify_event(
-                pool,
-                telegram,
-                event_id,
-                spec.type,
-                spec.severity,
-                spec.message,
-                spec.data,
-                device,
-                AUDIENCE.get(spec.type, ()),
-                spec.needs_ack,
-            )
-        except Exception as exc:  # noqa: BLE001
-            log.warning("ошибка рассылки уведомлений по событию %s: %s", event_id, exc)
 
     log.info("событие %s (%s) устройства %s", spec.type, spec.severity, device_id)
     return event_id

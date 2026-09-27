@@ -12,7 +12,7 @@ from .config import settings
 log = logging.getLogger("binsense.db")
 
 MIGRATIONS_DIR = pathlib.Path(__file__).resolve().parent.parent / "migrations"
-# Блокировка, чтобы мигрировала только одна реплика (api / ingestor / bot стартуют вместе)
+# Блокировка, чтобы мигрировала только одна реплика (api и ingestor стартуют вместе)
 MIGRATION_LOCK_ID = 0x1B155E01
 
 

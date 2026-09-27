@@ -1,4 +1,4 @@
-"""Правила, по которым телеметрия превращается в события и уведомления.
+"""Правила, по которым телеметрия превращается в события.
 
 Функции этого модуля — чистые: на вход состояние устройства и новые значения,
 на выход список событий и новое состояние. Это позволяет покрыть правила тестами
@@ -11,36 +11,6 @@ from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from .config import settings
-
-# Кому какие события уходят в Telegram
-AUDIENCE: dict[str, tuple[str, ...]] = {
-    "full": ("admin", "dispatcher", "driver"),
-    "full_urgent": ("admin", "dispatcher"),
-    "collected": ("admin", "dispatcher"),
-    "offline": ("admin", "dispatcher"),
-    "online": ("admin", "dispatcher"),
-    "sensor_error": ("admin",),
-    "calibrated": ("admin", "dispatcher"),
-    "hello": (),
-    "claimed": (),
-    "unclaimed": (),
-    "config_applied": (),
-}
-
-ICONS = {
-    "full": "🟠",
-    "full_urgent": "🔴",
-    "collected": "✅",
-    "offline": "📡",
-    "online": "📶",
-    "sensor_error": "🛠",
-    "calibrated": "📏",
-    "hello": "👋",
-    "claimed": "🔗",
-    "unclaimed": "🔓",
-    "config_applied": "⚙️",
-}
-
 
 @dataclass
 class EventSpec:
@@ -145,7 +115,7 @@ def evaluate_urgent(device, state: dict[str, Any], full_ack_at) -> tuple[list[Ev
             needs_ack=True,
             message=(
                 f"Срочно вывезти: {device_title(device)} — {fill}%, "
-                f"уведомление не подтверждено {hours} ч"
+                f"событие не подтверждено {hours} ч"
             ),
             data={"fill": fill},
         )

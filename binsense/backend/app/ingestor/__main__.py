@@ -8,7 +8,6 @@ import sys
 from ..config import settings
 from ..db import create_pool, migrate
 from ..mqtt import mqtt_admin
-from ..notify import TelegramClient
 from .service import Ingestor
 
 log = logging.getLogger("binsense.ingestor")
@@ -26,16 +25,11 @@ async def main() -> None:
     except Exception as exc:  # noqa: BLE001
         log.warning("не удалось настроить роль backend в брокере: %s", exc)
 
-    telegram = TelegramClient()
-    if not telegram.enabled:
-        log.warning("TELEGRAM_BOT_TOKEN не задан — уведомления в Telegram отключены")
-
-    ingestor = Ingestor(pool, telegram)
+    ingestor = Ingestor(pool)
     log.info("ingestor запущен, брокер %s:%s", settings.mqtt_host, settings.mqtt_port)
     try:
         await ingestor.run()
     finally:
-        await telegram.close()
         await pool.close()
 
 

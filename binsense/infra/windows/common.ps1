@@ -53,6 +53,15 @@ function Get-LanAddress {
     return ($all | Select-Object -First 1).IPAddress
 }
 
+# 5432 часто занят уже установленной службой PostgreSQL — тогда PG_PORT в .env
+function Get-PgPort {
+    if (Test-Path -LiteralPath $EnvFile) {
+        $value = (Read-DotEnv $EnvFile).PG_PORT
+        if ($value) { return [int]$value }
+    }
+    return 5432
+}
+
 function ConvertTo-ArgumentList([string[]]$Arguments) {
     $Arguments | ForEach-Object { if ($_ -match '\s') { '"' + $_ + '"' } else { $_ } }
 }
@@ -64,7 +73,7 @@ function Start-Postgres($P) {
     & (Join-Path $P.PgBin "pg_ctl.exe") status -D $P.PgData | Out-Null
     if ($LASTEXITCODE -eq 0) { return $false }
     $arguments = ConvertTo-ArgumentList @("start", "-w", "-D", $P.PgData,
-        "-l", (Join-Path $P.Logs "postgres.log"), "-o", "-h 127.0.0.1 -p 5432")
+        "-l", (Join-Path $P.Logs "postgres.log"), "-o", "-h 127.0.0.1 -p $(Get-PgPort)")
     $proc = Start-Process -FilePath (Join-Path $P.PgBin "pg_ctl.exe") -ArgumentList $arguments `
         -WindowStyle Hidden -PassThru
     $null = $proc.Handle  # без этого ExitCode после выхода бывает пустым

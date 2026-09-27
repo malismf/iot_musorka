@@ -13,7 +13,7 @@ read -r -p "Восстановить $DUMP поверх текущей базы?
 [ "$answer" = "yes" ] || { echo "отменено"; exit 1; }
 
 echo "== Останавливаю сервисы, которые пишут в базу"
-docker compose stop api ingestor bot
+docker compose stop api ingestor
 
 echo "== Пересоздаю базу"
 docker compose exec -T db psql -U binsense -d postgres -c "DROP DATABASE IF EXISTS binsense;"
@@ -23,5 +23,5 @@ echo "== Заливаю дамп"
 gunzip -c "$DUMP" | docker compose exec -T db psql -U binsense -d binsense
 
 echo "== Запускаю сервисы"
-docker compose start api ingestor bot
+docker compose start api ingestor
 echo "Готово"

@@ -1,7 +1,6 @@
-"""Регистрация, вход, профиль, привязка Telegram."""
+"""Регистрация, вход, профиль."""
 from __future__ import annotations
 
-import datetime as dt
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -13,11 +12,10 @@ from ...schemas import (
     LoginIn,
     MeUpdateIn,
     RegisterIn,
-    TelegramLinkOut,
     TokenOut,
     UserOut,
 )
-from ...security import create_token, generate_link_token, hash_password, verify_password
+from ...security import create_token, hash_password, verify_password
 from ..deps import PoolDep, UserDep, client_ip
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -30,9 +28,6 @@ def user_out(row) -> UserOut:
         email=row["email"],
         name=row["name"],
         role=row["role"],
-        telegram_linked=row["telegram_chat_id"] is not None,
-        notify_enabled=row["notify_enabled"],
-        notify_info=row["notify_info"],
         created_at=row["created_at"],
         last_login_at=row["last_login_at"],
     )
@@ -101,38 +96,13 @@ async def update_me(body: MeUpdateIn, user: UserDep, pool: PoolDep) -> UserOut:
         """
         UPDATE users
            SET name = COALESCE($2, name),
-               password_hash = COALESCE($3, password_hash),
-               notify_enabled = COALESCE($4, notify_enabled),
-               notify_info = COALESCE($5, notify_info)
+               password_hash = COALESCE($3, password_hash)
          WHERE id = $1
         RETURNING *
         """,
         user["id"],
         body.name,
         hash_password(body.password) if body.password else None,
-        body.notify_enabled,
-        body.notify_info,
     )
     return user_out(row)
 
-
-@me_router.post("/telegram-link", response_model=TelegramLinkOut)
-async def telegram_link(user: UserDep, pool: PoolDep) -> TelegramLinkOut:
-    """Выдаёт одноразовый токен: пользователь открывает t.me/<bot>?start=<token>."""
-    token = generate_link_token()
-    expires = dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=30)
-    await pool.execute(
-        "INSERT INTO telegram_links(token, user_id, expires_at) VALUES ($1, $2, $3)",
-        token,
-        user["id"],
-        expires,
-    )
-    bot = settings.telegram_bot_username.lstrip("@")
-    url = f"https://t.me/{bot}?start={token}" if bot else ""
-    return TelegramLinkOut(token=token, url=url, expires_at=expires)
-
-
-@me_router.delete("/telegram", status_code=status.HTTP_204_NO_CONTENT)
-async def telegram_unlink(user: UserDep, pool: PoolDep) -> None:
-    await pool.execute("UPDATE users SET telegram_chat_id = NULL WHERE id = $1", user["id"])
-    await log_action(pool, user["id"], "telegram_unlink")

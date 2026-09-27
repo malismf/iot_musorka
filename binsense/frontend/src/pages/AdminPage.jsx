@@ -176,7 +176,6 @@ function UsersTab({ toast, me }) {
             <th>Почта</th>
             <th>Имя</th>
             <th>Роль</th>
-            <th>Telegram</th>
             <th>Последний вход</th>
           </tr>
         </thead>
@@ -197,7 +196,6 @@ function UsersTab({ toast, me }) {
                   <option value="driver">водитель</option>
                 </select>
               </td>
-              <td>{user.telegram_linked ? '✅' : '—'}</td>
               <td>{formatDateTime(user.last_login_at)}</td>
             </tr>
           ))}

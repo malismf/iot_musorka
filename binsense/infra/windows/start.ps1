@@ -27,7 +27,7 @@ foreach ($key in $cfg.Keys) {
     # TZ=Europe/Moscow C-библиотека Windows не понимает и сдвигает местное время
     if ($key -ne "TZ") { Set-Item -Path "env:$key" -Value $cfg[$key] }
 }
-$env:DATABASE_URL = "postgresql://binsense:$($cfg.POSTGRES_PASSWORD)@127.0.0.1:5432/binsense"
+$env:DATABASE_URL = "postgresql://binsense:$($cfg.POSTGRES_PASSWORD)@127.0.0.1:$(Get-PgPort)/binsense"
 $env:MQTT_HOST = "127.0.0.1"
 $env:MQTT_PORT = "1883"
 $env:PYTHONUNBUFFERED = "1"
@@ -46,7 +46,7 @@ function Start-Worker([string]$Name, [string]$Exe, [string[]]$Arguments, [string
     Write-Host ("  {0,-10} PID {1}" -f $Name, $proc.Id)
 }
 
-Write-Host "== PostgreSQL (127.0.0.1:5432)"
+Write-Host "== PostgreSQL (127.0.0.1:$(Get-PgPort))"
 $null = Start-Postgres $P
 
 Write-Host "== Сервисы"
@@ -67,7 +67,6 @@ $backend = Join-Path $Repo "backend"
 Start-Worker "api" $P.Python @("-m", "uvicorn", "app.api.main:app", "--host", "127.0.0.1",
     "--port", "8000", "--proxy-headers", "--loop", "asyncio:SelectorEventLoop") $backend
 Start-Worker "ingestor" $P.Python @("-m", "app.ingestor") $backend
-Start-Worker "bot" $P.Python @("-m", "app.bot") $backend
 Start-Worker "caddy" $P.Caddy @("run", "--config", (Join-Path $PSScriptRoot "Caddyfile"),
     "--adapter", "caddyfile") $P.Root
 

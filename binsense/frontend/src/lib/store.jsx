@@ -95,7 +95,7 @@ export function AppProvider({ children }) {
     })
   }, [])
 
-  // публичные настройки (центр карты, имя бота) — нужны и на экране входа
+  // публичные настройки (центр карты) — нужны и на экране входа
   useEffect(() => {
     api('/config/public', { token: '' })
       .then(setPublicConfig)

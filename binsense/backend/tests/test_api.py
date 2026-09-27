@@ -248,14 +248,6 @@ async def test_admin_users_and_audit(client, admin, device):
     assert {"register", "login", "provision", "claim"} <= actions
 
 
-async def test_telegram_link_token(client, admin, pool):
-    response = await client.post("/api/me/telegram-link")
-    assert response.status_code == 200
-    token = response.json()["token"]
-    stored = await pool.fetchrow("SELECT * FROM telegram_links WHERE token = $1", token)
-    assert stored["user_id"] == admin["id"]
-
-
 async def test_openapi_schema(client):
     schema = (await client.get("/api/openapi.json")).json()
     assert schema["info"]["title"] == "BinSense API"

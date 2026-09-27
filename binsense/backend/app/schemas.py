@@ -90,9 +90,6 @@ class UserOut(BaseModel):
     email: str
     name: str
     role: Role
-    telegram_linked: bool = False
-    notify_enabled: bool = True
-    notify_info: bool = False
     created_at: Optional[dt.datetime] = None
     last_login_at: Optional[dt.datetime] = None
 
@@ -100,18 +97,10 @@ class UserOut(BaseModel):
 class MeUpdateIn(BaseModel):
     name: Optional[str] = Field(default=None, max_length=120)
     password: Optional[str] = Field(default=None, min_length=8, max_length=128)
-    notify_enabled: Optional[bool] = None
-    notify_info: Optional[bool] = None
 
 
 class RoleUpdateIn(BaseModel):
     role: Role
-
-
-class TelegramLinkOut(BaseModel):
-    token: str
-    url: str
-    expires_at: dt.datetime
 
 
 # --- Устройства --------------------------------------------------------------
@@ -275,7 +264,6 @@ class RouteOut(BaseModel):
 class PublicConfigOut(BaseModel):
     map_center: list[float]
     map_zoom: int
-    bot_username: str
     public_url: str
     allow_registration: bool
     version: str

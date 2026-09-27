@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # --- Общее ---------------------------------------------------------------
-    public_url: str = "http://localhost"          # адрес веб-приложения (ссылки привязки, Telegram)
+    public_url: str = "http://localhost"          # адрес веб-приложения (ссылки привязки)
     log_level: str = "INFO"
 
     # --- База данных ---------------------------------------------------------
@@ -35,11 +35,6 @@ class Settings(BaseSettings):
     mqtt_public_port: int = 1883
     mqtt_topic_prefix: str = "bins"
 
-    # --- Telegram ------------------------------------------------------------
-    telegram_bot_token: str = ""
-    telegram_bot_username: str = ""
-    telegram_api_base: str = "https://api.telegram.org"
-
     # --- Карта ---------------------------------------------------------------
     map_center: str = "55.7558,37.6173"
     map_zoom: int = 12
@@ -57,10 +52,10 @@ class Settings(BaseSettings):
     default_tz: str = "MSK-3"                     # POSIX TZ для устройства
     default_full_mm: int = 250                    # мёртвая зона датчика + запас
 
-    # --- Правила уведомлений -------------------------------------------------
+    # --- Правила событий -----------------------------------------------------
     offline_factor: float = 1.5                   # нет связи дольше heartbeat * factor
     urgent_fill: int = 95
-    urgent_delay_min: int = 120                   # если уведомление не подтверждено N минут
+    urgent_delay_min: int = 120                   # если событие не подтверждено N минут
     collected_low_pct: int = 15                   # вывоз: было >= high, стало <= low
     collected_high_pct: int = 50
 

@@ -5,7 +5,6 @@ import datetime as dt
 
 from app.api.routes.stats import google_maps_urls, haversine
 from app.forecast import forecast_fill, linear_fit
-from app.notify import event_buttons, format_event
 from app.rules import evaluate_telemetry, evaluate_urgent, offline_event
 from app.schemas import RouteStop
 from app.security import (
@@ -122,18 +121,6 @@ def test_haversine():
     # расстояние между Красной площадью и Лужниками — около 7 км
     distance = haversine(55.7539, 37.6208, 55.7158, 37.5535)
     assert 5 < distance < 9
-
-
-def test_notification_text_and_buttons():
-    text = format_event("full", "Контейнер заполнен на 85%: Площадка №1", {}, DEVICE)
-    assert "Контейнер заполнен" in text
-    assert "заполнено 90%" in text  # подмешиваются текущие значения устройства
-    assert "<b>" in text
-
-    buttons = event_buttons(42, "bin-test01", needs_ack=True)
-    assert buttons[0][0]["callback_data"] == "ack:42"
-    # http-адрес в кнопку-ссылку Telegram не принимает, поэтому её нет
-    assert all("url" not in button for button in buttons[0])
 
 
 def test_password_hashing():

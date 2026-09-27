@@ -69,21 +69,6 @@ services:
       mqtt:
         condition: service_started
 
-  bot:
-    build: ./backend
-    image: binsense/backend:local
-    restart: unless-stopped
-    command: ["python", "-m", "app.bot"]
-    env_file: .env
-    environment:
-      DATABASE_URL: postgresql://binsense:${POSTGRES_PASSWORD}@db:5432/binsense
-      MQTT_HOST: mqtt
-      MQTT_PORT: 1883
-      TZ: ${TZ:-Europe/Moscow}
-    depends_on:
-      db:
-        condition: service_healthy
-
   web:
     build: ./frontend
     image: binsense/web:local

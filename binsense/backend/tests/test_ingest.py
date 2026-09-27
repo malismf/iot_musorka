@@ -1,4 +1,4 @@
-"""Тесты ingestor: приём телеметрии, дубли, потери, события и уведомления."""
+"""Тесты ingestor: приём телеметрии, дубли, потери, события."""
 from __future__ import annotations
 
 import json
@@ -7,29 +7,11 @@ import pytest
 import pytest_asyncio
 
 from app.ingestor.service import Ingestor
-from app.notify import TelegramClient
-
-
-class FakeTelegram(TelegramClient):
-    """Вместо обращения к Telegram запоминает сообщения."""
-
-    def __init__(self) -> None:
-        super().__init__(token="fake-token", api_base="http://localhost")
-        self.sent: list[tuple[int, str, list | None]] = []
-
-    async def send_message(self, chat_id: int, text: str, buttons=None) -> dict:
-        self.sent.append((chat_id, text, buttons))
-        return {"message_id": len(self.sent)}
 
 
 @pytest_asyncio.fixture
-async def telegram() -> FakeTelegram:
-    return FakeTelegram()
-
-
-@pytest_asyncio.fixture
-async def ingestor(pool, telegram, fake_mqtt) -> Ingestor:
-    return Ingestor(pool, telegram)
+async def ingestor(pool, fake_mqtt) -> Ingestor:
+    return Ingestor(pool)
 
 
 def telemetry(**overrides) -> bytes:
@@ -48,16 +30,6 @@ def telemetry(**overrides) -> bytes:
     }
     payload.update(overrides)
     return json.dumps(payload).encode()
-
-
-async def subscribe_user(pool, role: str = "dispatcher", chat_id: int = 555) -> int:
-    return await pool.fetchval(
-        """INSERT INTO users(email, password_hash, name, role, telegram_chat_id)
-           VALUES ($1, 'x', 'Диспетчер', $2, $3) RETURNING id""",
-        f"{role}-{chat_id}@binsense.test",
-        role,
-        chat_id,
-    )
 
 
 async def test_telemetry_is_stored(ingestor, pool, device):
@@ -118,49 +90,31 @@ async def test_unknown_device_and_bad_payload(ingestor, device):
     assert not await ingestor.handle_telemetry(device["device_id"], b"{not json")
 
 
-async def test_full_event_notifies_subscribers(ingestor, pool, device, telegram):
+async def test_full_event_needs_ack(ingestor, pool, device):
     device_id = device["device_id"]
-    chat_id = 777
-    await subscribe_user(pool, "dispatcher", chat_id)
-
+    query = "SELECT * FROM events WHERE device_id = $1 AND type = 'full'"
     await ingestor.handle_telemetry(device_id, telemetry(seq=1, fill=20))
-    assert telegram.sent == []
+    assert await pool.fetchrow(query, device_id) is None
 
     await ingestor.handle_telemetry(device_id, telemetry(seq=2, fill=88))
-    assert len(telegram.sent) == 1
-    sent_chat, text, buttons = telegram.sent[0]
-    assert sent_chat == chat_id
-    assert "заполнен" in text.lower()
-    assert buttons[0][0]["callback_data"].startswith("ack:")
-
-    event = await pool.fetchrow(
-        "SELECT * FROM events WHERE device_id = $1 AND type = 'full'", device_id
-    )
+    event = await pool.fetchrow(query, device_id)
+    assert "заполнен" in event["message"].lower()
     assert event["needs_ack"] is True
-    notification = await pool.fetchrow(
-        "SELECT * FROM notifications WHERE event_id = $1", event["id"]
-    )
-    assert notification["status"] == "sent"
 
 
-async def test_info_events_only_for_subscribed_users(ingestor, pool, device, telegram):
+async def test_collection_resolves_full_event(ingestor, pool, device):
     device_id = device["device_id"]
-    await subscribe_user(pool, "dispatcher", 111)  # notify_info по умолчанию выключен
     await ingestor.handle_telemetry(device_id, telemetry(seq=1, fill=90))
     await ingestor.handle_telemetry(device_id, telemetry(seq=2, fill=5))  # вывоз
 
-    types = [
-        row["type"]
-        for row in await pool.fetch("SELECT type FROM events WHERE device_id = $1", device_id)
-    ]
-    assert "collected" in types
-    # ушло только предупреждение о заполнении, информационное — нет
-    assert len(telegram.sent) == 1
-
-    await pool.execute("UPDATE users SET notify_info = TRUE WHERE telegram_chat_id = 111")
-    await ingestor.handle_telemetry(device_id, telemetry(seq=3, fill=95))
-    await ingestor.handle_telemetry(device_id, telemetry(seq=4, fill=4))
-    assert any("вывезен" in text.lower() for _, text, _ in telegram.sent)
+    collected = await pool.fetchrow(
+        "SELECT * FROM events WHERE device_id = $1 AND type = 'collected'", device_id
+    )
+    assert "вывезен" in collected["message"].lower()
+    full = await pool.fetchrow(
+        "SELECT * FROM events WHERE device_id = $1 AND type = 'full'", device_id
+    )
+    assert full["resolved_at"] is not None
 
 
 async def test_calibration_event_updates_device(ingestor, pool, device, fake_mqtt):
@@ -183,18 +137,16 @@ async def test_calibration_event_updates_device(ingestor, pool, device, fake_mqt
     assert "123 см" in event["message"]
 
 
-async def test_sensor_error_event(ingestor, pool, device, telegram):
-    await subscribe_user(pool, "admin", 999)
+async def test_sensor_error_event(ingestor, pool, device):
     payload = json.dumps({"type": "error", "code": "SENSOR_TIMEOUT"}).encode()
     await ingestor.handle_event(device["device_id"], payload)
     event = await pool.fetchrow("SELECT * FROM events WHERE type = 'sensor_error'")
     assert event["data"]["code"] == "SENSOR_TIMEOUT"
-    assert len(telegram.sent) == 1
+    assert event["needs_ack"] is True
 
 
-async def test_offline_detection(ingestor, pool, device, telegram):
+async def test_offline_detection(ingestor, pool, device):
     device_id = device["device_id"]
-    await subscribe_user(pool, "dispatcher", 222)
     await ingestor.handle_telemetry(device_id, telemetry())
     assert await pool.fetchval("SELECT online FROM devices WHERE id = $1", device_id)
 
@@ -204,8 +156,8 @@ async def test_offline_detection(ingestor, pool, device, telegram):
     )
     assert await ingestor.check_offline() == 1
     assert not await pool.fetchval("SELECT online FROM devices WHERE id = $1", device_id)
-    assert await pool.fetchval("SELECT count(*) FROM events WHERE type = 'offline'") == 1
-    assert any("нет связи" in text.lower() for _, text, _ in telegram.sent)
+    message = await pool.fetchval("SELECT message FROM events WHERE type = 'offline'")
+    assert "нет связи" in message.lower()
 
     # повторный вызов не плодит события
     assert await ingestor.check_offline() == 0
@@ -218,9 +170,8 @@ async def test_offline_detection(ingestor, pool, device, telegram):
     assert offline_event["resolved_at"] is not None
 
 
-async def test_urgent_escalation(ingestor, pool, device, telegram):
+async def test_urgent_escalation(ingestor, pool, device):
     device_id = device["device_id"]
-    await subscribe_user(pool, "dispatcher", 333)
     await ingestor.handle_telemetry(device_id, telemetry(fill=97))
     assert await ingestor.check_urgent() == 0  # ещё не прошло два часа
 

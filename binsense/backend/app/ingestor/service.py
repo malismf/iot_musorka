@@ -1,4 +1,4 @@
-"""Ingestor: приём MQTT-сообщений, запись в БД, правила и уведомления."""
+"""Ingestor: приём MQTT-сообщений, запись в БД, правила и события."""
 from __future__ import annotations
 
 import asyncio
@@ -15,7 +15,6 @@ from ..config import settings
 from ..devices import build_config_payload, default_config, device_to_out, fetch_device
 from ..events import broadcast, store_event
 from ..mqtt import mqtt_admin
-from ..notify import TelegramClient
 from ..rules import (
     device_event,
     evaluate_telemetry,
@@ -45,9 +44,8 @@ def _utc(seconds: Optional[int]) -> Optional[dt.datetime]:
 
 
 class Ingestor:
-    def __init__(self, pool: asyncpg.Pool, telegram: Optional[TelegramClient] = None) -> None:
+    def __init__(self, pool: asyncpg.Pool) -> None:
         self.pool = pool
-        self.telegram = telegram or TelegramClient()
 
     # --- телеметрия ----------------------------------------------------------
     async def handle_telemetry(self, device_id: str, raw: bytes) -> bool:
@@ -174,7 +172,7 @@ class Ingestor:
             {"type": "telemetry", "device": device_to_out(merged).model_dump(mode="json")},
         )
         for spec in specs:
-            await store_event(self.pool, merged, spec, self.telegram)
+            await store_event(self.pool, merged, spec)
         return True
 
     # --- события устройства --------------------------------------------------
@@ -227,7 +225,7 @@ class Ingestor:
 
         spec = device_event(merged, payload)
         if spec is not None:
-            await store_event(self.pool, merged, spec, self.telegram)
+            await store_event(self.pool, merged, spec)
         await broadcast(
             self.pool,
             {"type": "telemetry", "device": device_to_out(merged).model_dump(mode="json")},
@@ -271,9 +269,7 @@ class Ingestor:
             await self.pool.execute("UPDATE devices SET online = FALSE WHERE id = $1", row["id"])
             merged = dict(row)
             merged["online"] = False
-            await store_event(
-                self.pool, merged, offline_event(merged, row["heartbeat_s"]), self.telegram
-            )
+            await store_event(self.pool, merged, offline_event(merged, row["heartbeat_s"]))
             await broadcast(
                 self.pool,
                 {"type": "telemetry", "device": device_to_out(merged).model_dump(mode="json")},
@@ -307,7 +303,7 @@ class Ingestor:
                 "UPDATE devices SET state = $2 WHERE id = $1", row["id"], state
             )
             for spec in specs:
-                await store_event(self.pool, row, spec, self.telegram)
+                await store_event(self.pool, row, spec)
             count += 1
         return count
 
@@ -323,9 +319,6 @@ class Ingestor:
         await self.pool.execute(
             "DELETE FROM api_requests WHERE ts < now() - make_interval(days => $1)",
             settings.metrics_retention_days,
-        )
-        await self.pool.execute(
-            "DELETE FROM telegram_links WHERE expires_at < now() - interval '1 day'"
         )
 
     # --- циклы ---------------------------------------------------------------

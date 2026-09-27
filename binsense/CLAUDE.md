@@ -1,8 +1,8 @@
 # BinSense — контекст проекта
 
 Система мониторинга заполненности мусорных контейнеров: датчик на ESP8266
-(NodeMCU, питание от USB) под крышкой → MQTT → сервер → карта в браузере и
-уведомления в Telegram.
+(NodeMCU, питание от USB) под крышкой → MQTT → сервер → карта и уведомления
+в браузере.
 Учебный проект, 3 человека. Документация — в `docs/`, начинать с `README.md`.
 
 ## Стек
@@ -10,7 +10,7 @@
 | Часть | Технологии |
 |---|---|
 | Прошивка | ESP8266 (NodeMCU / D1 mini), PlatformIO + Arduino, WiFiManager, 256dpi/MQTT (QoS 1) |
-| Сервер | Python 3.12, FastAPI, asyncpg, aiomqtt, aiogram 3, PostgreSQL 16, Mosquitto 2 |
+| Сервер | Python 3.12, FastAPI, asyncpg, aiomqtt, PostgreSQL 16, Mosquitto 2 |
 | Веб | React 18 + Vite, react-leaflet, Chart.js (JSX, без TypeScript) |
 | Инфраструктура | docker compose, Caddy (HTTPS), Grafana |
 
@@ -19,7 +19,7 @@
 ```
 firmware/        прошивка; src/measure.cpp и src/json_lite.cpp — чистая логика без Arduino
 firmware/hosttest/  тесты логики + пробная сборка с заглушками (g++, без железа)
-backend/app/     api/ (FastAPI), ingestor/ (MQTT → БД → правила), bot/ (aiogram)
+backend/app/     api/ (FastAPI), ingestor/ (MQTT → БД → правила → события)
 backend/app/rules.py      правила событий — чистые функции, покрыты тестами
 backend/migrations/       SQL-миграции, применяются при старте (app/db.py)
 frontend/src/    pages/ + components/ + lib/ (api.js, store.jsx с WebSocket)
@@ -44,7 +44,7 @@ cd frontend && npm install && npm run dev          # :5173, прокси на :8
 
 # тесты
 cd backend && TEST_DATABASE_URL=postgresql://binsense:ПАРОЛЬ@localhost:5432/binsense_test \
-    python -m pytest                               # 48 тестов, нужна живая БД
+    python -m pytest                               # 39 тестов, нужна живая БД
 cd firmware/hosttest && ./run.sh                   # 58 проверок + компиляция (CXX=… для не-g++)
 
 # без Docker на Windows (docs/LOCAL_TEST.md §3б): рантайм в %USERPROFILE%\binsense-run
@@ -87,6 +87,10 @@ cd hardware/schematic && python make_schematic.py
   миграция `002_drop_lid.sql`). Замер мог попасть на открытую крышку, поэтому скачок уровня ≥ 20 % или сбой
   датчика перемеряется через 60 с перед отправкой (`measure.cpp::needsRecheck`,
   `RECHECK_*` в `config.h`). Не возвращайте `lid_opens`/`lid_left_open`.
+- **Telegram-бота нет** (убран вместе с таблицами и полями пользователей —
+  миграция `004_drop_telegram.sql`). События видны в веб-приложении: лента,
+  всплывающие предупреждения по WebSocket, кнопка «Принято». Не возвращайте
+  `bot/`, `notify.py`, `telegram_links` и `notifications`.
 - **Привязка — по коду, без наклеек и QR.** `provision.py` выводит код и
   ссылку `PUBLIC_URL/claim?id=…&code=…`, страница привязки заполняется из
   ссылки или вручную. Код показывается один раз, новый — `--reset-code`.
@@ -113,7 +117,7 @@ cd hardware/schematic && python make_schematic.py
 |---|---|
 | Поле телеметрии | `firmware/src/main.cpp::buildTelemetry`, `backend/app/schemas.py::TelemetryIn`, таблицы `telemetry`/`device_metrics` (новая миграция), `docs/asyncapi.yaml`, `docs/PROTOCOL.md` |
 | Поле настроек устройства | `CONFIG_FIELDS` в `backend/app/devices.py`, `build_config_payload`, `DeviceUpdateIn`, `NetLink::applyConfig` и `Storage` в прошивке, форма в `frontend/src/pages/DevicePage.jsx`, asyncapi |
-| Новый тип события | `backend/app/rules.py` (спека + `AUDIENCE` + `ICONS`), `app/notify.py::TYPE_TITLES`, `frontend/src/lib/format.js` (`EVENT_TITLES`, `EVENT_ICONS`) |
+| Новый тип события | `backend/app/rules.py` (спека), `frontend/src/lib/format.js` (`EVENT_TITLES`, `EVENT_ICONS`) |
 | Формула заполненности | одинаково в `firmware/src/measure.cpp::fillPercent` и в калибровке на сервере — иначе устройство и карточка разойдутся |
 | Схема БД | только новым файлом `backend/migrations/00N_*.sql` (применяются по порядку, с advisory-lock) |
 | Панель Grafana | правьте `infra/grafana/make_dashboard.py` и перегенерируйте JSON, руками JSON не редактируйте |
@@ -135,20 +139,19 @@ cd hardware/schematic && python make_schematic.py
 ## Текущее состояние
 
 Работает и проверено на локальном стенде: подготовка устройства → привязка по
-коду → retained-настройки → телеметрия → события → Telegram → подтверждение →
-вывоз → история, прогноз, маршрут, метрики. Прошло 48 тестов сервера,
+коду → retained-настройки → телеметрия → события → подтверждение → вывоз →
+история, прогноз, маршрут, метрики. Прошло 39 тестов сервера,
 58 проверок логики прошивки, сборка обоих вариантов прошивки настоящим
 тулчейном ESP8266 (PlatformIO), сборка фронтенда. Готовые образы — в
 `%USERPROFILE%\binsense-run\fw-release` на машине разработчика.
 
 Схемы: принципиальная (2 листа), монтажная и список цепей —
 `hardware/schematic/`. Презентация: 19 слайдов, опубликована отдельно;
-тезисы и вопросы — в `docs/presentation/README.md`. Презентация ещё описывает
-ESP32 с аккумулятором — её нужно обновить отдельно.
+тезисы и вопросы — в `docs/presentation/README.md`. Презентация и тезисы ещё
+описывают ESP32 с аккумулятором и Telegram-бота — их нужно обновить отдельно.
 
-Не проверялось вживую: сборка docker-образов (в песочнице был закрыт реестр),
-работа на реальной плате ESP8266 и реальный Telegram Bot API (использовалась
-заглушка).
+Не проверялось вживую: сборка docker-образов (в песочнице был закрыт реестр)
+и работа на реальной плате ESP8266.
 
 Осталось команде: собрать устройство на реальном железе в готовой герметичной
 коробке, пройти стенд по `docs/LOCAL_TEST.md`, снять фотографии и видео по
@@ -156,8 +159,8 @@ ESP32 с аккумулятором — её нужно обновить отд�
 
 ## Известные шероховатости
 
-- Прогноз заполнения на данных эмулятора показывает абсурдную скорость
-  (время ускорено в сотни раз) — на реальных данных корректен.
+- Прогноз, объём контейнера и уровень Wi-Fi убраны из интерфейса (для демо
+  мало данных, объём ни на что не влияет); в API они остались — RSSI нужен Grafana.
 - Плитки OpenStreetMap требуют интернета; для закрытого контура адрес слоя
   меняется в `frontend/src/lib/tiles.js`.
 - Геолокация на странице привязки работает только по HTTPS (или на

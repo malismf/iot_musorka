@@ -10,6 +10,11 @@ class Client {};
 
 class WiFiClient : public Client {};
 
+class IPAddress {
+ public:
+  String toString() const { return String("192.168.1.50"); }
+};
+
 class WiFiClass {
  public:
   int status() { return WL_CONNECTED; }
@@ -17,17 +22,12 @@ class WiFiClass {
             bool = true) {
     return WL_CONNECTED;
   }
-  int begin() { return WL_CONNECTED; }
-  void disconnect(bool = false, bool = false) {}
-  void mode(int) {}
-  void setSleep(bool) {}
+  bool disconnect(bool = false) { return true; }
+  bool mode(int) { return true; }
   void persistent(bool) {}
+  bool setAutoReconnect(bool) { return true; }
   int32_t RSSI() { return -62; }
-  uint8_t *BSSID() {
-    static uint8_t bssid[6] = {1, 2, 3, 4, 5, 6};
-    return bssid;
-  }
-  int32_t channel() { return 6; }
+  IPAddress localIP() { return IPAddress(); }
   String SSID() { return String("test"); }
 };
 

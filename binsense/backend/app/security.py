@@ -89,7 +89,3 @@ def generate_mqtt_password(length: int = 24) -> str:
     alphabet = string.ascii_letters + string.digits
     return "".join(secrets.choice(alphabet) for _ in range(length))
 
-
-def generate_link_token() -> str:
-    """Токен для deep-link Telegram: /start <token>. Допустимы A-Za-z0-9_-, до 64 символов."""
-    return secrets.token_urlsafe(24)

@@ -7,7 +7,6 @@ import { useApp } from '../lib/store'
 const COLUMNS = [
   { key: 'name', title: 'Контейнер' },
   { key: 'fill', title: 'Заполненность' },
-  { key: 'rssi', title: 'Wi-Fi' },
   { key: 'last_seen', title: 'Данные' },
   { key: 'status', title: 'Состояние' },
 ]
@@ -75,7 +74,6 @@ export default function ListPage() {
                 <td style={{ minWidth: 150 }}>
                   <FillBar device={device} />
                 </td>
-                <td>{device.rssi !== null && device.rssi !== undefined ? `${device.rssi} dBm` : '—'}</td>
                 <td>{timeAgo(device.last_seen)}</td>
                 <td>
                   <span className={`badge ${badgeClass(device)}`}>{statusLabel(device)}</span>

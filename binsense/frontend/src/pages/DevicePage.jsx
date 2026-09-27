@@ -18,7 +18,6 @@ import {
   fillColor,
   fillLabel,
   formatDateTime,
-  formatDuration,
   statusLabel,
   timeAgo,
 } from '../lib/format'
@@ -39,7 +38,6 @@ export default function DevicePage() {
   const [device, setDevice] = useState(null)
   const [points, setPoints] = useState([])
   const [events, setEvents] = useState([])
-  const [forecast, setForecast] = useState(null)
   const [range, setRange] = useState(RANGES[0])
   const [error, setError] = useState('')
 
@@ -47,14 +45,12 @@ export default function DevicePage() {
 
   const load = useCallback(async () => {
     try {
-      const [deviceData, eventsData, forecastData] = await Promise.all([
+      const [deviceData, eventsData] = await Promise.all([
         api(`/devices/${id}`),
         api(`/devices/${id}/events`, { params: { limit: 30 } }),
-        api(`/devices/${id}/forecast`),
       ])
       setDevice(deviceData)
       setEvents(eventsData)
-      setForecast(forecastData)
     } catch (err) {
       setError(err.message)
     }
@@ -123,11 +119,9 @@ export default function DevicePage() {
               <Row label="Глубина контейнера (калибровка)">
                 {device.empty_mm ? `${(device.empty_mm / 10).toFixed(0)} см` : 'не откалиброван'}
               </Row>
-              <Row label="Wi-Fi">{device.rssi ? `${device.rssi} dBm` : '—'}</Row>
               <Row label="Последние данные">
                 {timeAgo(device.last_seen)} ({formatDateTime(device.last_seen)})
               </Row>
-              <Row label="Объём">{device.volume_l ? `${device.volume_l} л` : '—'}</Row>
               <Row label="Настройки">
                 {device.config_applied_version === device.config_version ? (
                   <span className="badge ok">применены (v{device.config_version})</span>
@@ -140,17 +134,6 @@ export default function DevicePage() {
               </Row>
             </tbody>
           </table>
-          {forecast && (
-            <p className="small" style={{ marginTop: 10 }}>
-              <b>Прогноз:</b>{' '}
-              {forecast.hours_to_full !== null && forecast.hours_to_full !== undefined
-                ? `заполнится через ${formatDuration(forecast.hours_to_full)} (${formatDateTime(
-                    forecast.eta,
-                  )})`
-                : forecast.note || 'недостаточно данных'}
-              {forecast.rate_pct_per_day ? ` · скорость ${forecast.rate_pct_per_day}%/сутки` : ''}
-            </p>
-          )}
         </div>
 
         <div className="card">
@@ -181,29 +164,6 @@ export default function DevicePage() {
                     borderColor: '#16a34a',
                     backgroundColor: 'rgba(22,163,74,0.15)',
                     fill: true,
-                    tension: 0.25,
-                    pointRadius,
-                  },
-                ],
-              }}
-            />
-          </div>
-          <div className="chart-box" style={{ height: 160, marginTop: 10 }}>
-            <Line
-              options={{
-                ...chartOptions,
-                scales: {
-                  ...chartOptions.scales,
-                  y: { position: 'left', title: { display: true, text: 'dBm' } },
-                },
-              }}
-              data={{
-                labels,
-                datasets: [
-                  {
-                    label: 'Уровень Wi-Fi, dBm',
-                    data: points.map((p) => p.rssi),
-                    borderColor: '#0ea5e9',
                     tension: 0.25,
                     pointRadius,
                   },
@@ -264,7 +224,6 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
   const [form, setForm] = useState(() => ({
     name: device.name || '',
     address: device.address || '',
-    volume_l: device.volume_l || '',
     empty_cm: device.empty_mm ? Math.round(device.empty_mm / 10) : '',
     full_cm: device.full_mm ? Math.round(device.full_mm / 10) : '',
     full_pct: device.config.full_pct,
@@ -292,7 +251,6 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
       const body = {
         name: form.name,
         address: form.address,
-        volume_l: form.volume_l ? Number(form.volume_l) : null,
         empty_mm: form.empty_cm ? Math.round(Number(form.empty_cm) * 10) : null,
         full_mm: form.full_cm ? Math.round(Number(form.full_cm) * 10) : null,
         full_pct: Number(form.full_pct),
@@ -337,10 +295,6 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
             <input value={form.address} onChange={change('address')} disabled={!canEdit} />
           </label>
           <div className="row">
-            <label className="field" style={{ flex: 1 }}>
-              <span>Объём, л</span>
-              <input type="number" value={form.volume_l} onChange={change('volume_l')} disabled={!canEdit} />
-            </label>
             <label className="field" style={{ flex: 1 }}>
               <span>Глубина (0%), см</span>
               <input type="number" value={form.empty_cm} onChange={change('empty_cm')} disabled={!canEdit} />
@@ -422,8 +376,8 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
         )}
       </div>
       <p className="small muted" style={{ marginTop: 6 }}>
-        Настройки публикуются в MQTT как retained-сообщение: спящее устройство применит их при
-        следующем пробуждении и подтвердит номером версии.
+        Настройки публикуются в MQTT как retained-сообщение: устройство применит их, как только
+        получит (или после переподключения), и подтвердит номером версии.
       </p>
     </form>
   )
