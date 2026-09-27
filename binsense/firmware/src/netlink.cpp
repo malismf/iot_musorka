@@ -40,21 +40,14 @@ static bool due(uint32_t last, uint32_t period, bool tried) {
   return !tried || millis() - last >= period;
 }
 
-// --- Время -------------------------------------------------------------------
-void NetLink::applyTimezone(const char *tz) {
-  if (tz && tz[0]) {
-    setenv("TZ", tz, 1);
-    tzset();
-  }
-}
-
 // --- Подключение ------------------------------------------------------------
-void NetLink::begin(const char *tz) {
+void NetLink::begin() {
   WiFi.persistent(false);  // данные Wi-Fi храним сами, во флеш SDK не пишем
   WiFi.mode(WIFI_STA);
   WiFi.setAutoReconnect(true);
-  // NTP опрашивается в фоне; без интернета время просто не появится
-  configTime(tz && tz[0] ? tz : DEFAULT_TZ, "pool.ntp.org", "time.google.com");
+  // Время нужно только для меток в телеметрии (UTC). NTP опрашивается в фоне;
+  // без интернета время просто не появится
+  configTime("UTC0", "pool.ntp.org", "time.google.com");
 }
 
 bool NetLink::connectWifi(const char *ssid, const char *pass) {
@@ -150,7 +143,6 @@ bool NetLink::applyConfig(DeviceConfig &cfg) {
   configReceived = false;
   long value = 0;
   bool flag = false;
-  char text[40];
 
   long version = 0;
   if (!json::getInt(configPayload, "ver", version)) return false;
@@ -167,8 +159,6 @@ bool NetLink::applyConfig(DeviceConfig &cfg) {
   if (json::getInt(configPayload, "interval_s", value)) cfg.interval_s = (uint32_t)value;
   if (json::getInt(configPayload, "heartbeat_s", value)) cfg.heartbeat_s = (uint32_t)value;
   if (json::getInt(configPayload, "full_interval_s", value)) cfg.full_interval_s = (uint32_t)value;
-  if (json::getInt(configPayload, "night_interval_s", value))
-    cfg.night_interval_s = (uint32_t)value;
   if (json::getInt(configPayload, "full_pct", value)) cfg.full_pct = (uint8_t)value;
   if (json::getInt(configPayload, "delta_pct", value)) cfg.delta_pct = (uint8_t)value;
   if (json::getInt(configPayload, "samples", value)) {
@@ -176,15 +166,6 @@ bool NetLink::applyConfig(DeviceConfig &cfg) {
   }
   if (json::getInt(configPayload, "empty_mm", value) && value > 0) cfg.empty_mm = (uint32_t)value;
   if (json::getInt(configPayload, "full_mm", value) && value > 0) cfg.full_mm = (uint32_t)value;
-  if (json::getString(configPayload, "tz", text, sizeof(text))) {
-    strncpy(cfg.tz, text, sizeof(cfg.tz) - 1);
-    cfg.tz[sizeof(cfg.tz) - 1] = '\0';
-  }
-  long night[2];
-  if (json::getIntArray(configPayload, "night", night, 2) == 2) {
-    cfg.night_start = (uint8_t)night[0];
-    cfg.night_end = (uint8_t)night[1];
-  }
   Serial.printf("[cfg] приняты настройки версии %u\n", (unsigned)cfg.version);
   return true;
 }

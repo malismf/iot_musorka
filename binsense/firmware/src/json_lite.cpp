@@ -70,22 +70,6 @@ bool getString(const char *doc, const char *key, char *out, size_t maxLen) {
   return true;
 }
 
-size_t getIntArray(const char *doc, const char *key, long *out, size_t maxItems) {
-  const char *value = findValue(doc, key);
-  if (!value || *value != '[') return 0;
-  value++;
-  size_t count = 0;
-  while (*value && *value != ']' && count < maxItems) {
-    char *end = nullptr;
-    long parsed = strtol(value, &end, 10);
-    if (end == value) break;
-    out[count++] = parsed;
-    value = end;
-    while (*value == ' ' || *value == ',') value++;
-  }
-  return count;
-}
-
 // --- Writer ------------------------------------------------------------------
 Writer::Writer(char *buffer, size_t capacity)
     : buffer_(buffer), capacity_(capacity), length_(0), first_(true), overflow_(false) {

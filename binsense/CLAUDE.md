@@ -11,7 +11,7 @@
 |---|---|
 | Прошивка | ESP8266 (NodeMCU / D1 mini), PlatformIO + Arduino, WiFiManager, 256dpi/MQTT (QoS 1) |
 | Сервер | Python 3.12, FastAPI, asyncpg, aiomqtt, PostgreSQL 16, Mosquitto 2 |
-| Веб | React 18 + Vite, react-leaflet, Chart.js (JSX, без TypeScript) |
+| Веб | React 18 + Vite, react-leaflet, Chart.js, иконки lucide-react — без смайликов в интерфейсе (JSX, без TypeScript) |
 | Инфраструктура | docker compose, Caddy (HTTPS), Grafana |
 
 ## Структура
@@ -27,7 +27,7 @@ tools/           provision.py (подготовка устройств, код �
 infra/           mosquitto, caddy, grafana (дашборд генерируется make_dashboard.py)
 docs/            DEPLOY, LOCAL_TEST, ASSEMBLY, USER_GUIDE, PROTOCOL, asyncapi.yaml, openapi.json
 docs/presentation/  тезисы и вопросы к защите (README.md); слайды опубликованы отдельно
-hardware/schematic/ генератор схем: symbols.py + make_schematic.py, результат в SVG
+hardware/        BOM.csv и WIRING.md (распиновка); схему команда рисует сама
 ```
 
 ## Команды
@@ -44,8 +44,8 @@ cd frontend && npm install && npm run dev          # :5173, прокси на :8
 
 # тесты
 cd backend && TEST_DATABASE_URL=postgresql://binsense:ПАРОЛЬ@localhost:5432/binsense_test \
-    python -m pytest                               # 39 тестов, нужна живая БД
-cd firmware/hosttest && ./run.sh                   # 58 проверок + компиляция (CXX=… для не-g++)
+    python -m pytest                               # 37 тестов, нужна живая БД
+cd firmware/hosttest && ./run.sh                   # 51 проверка + компиляция (CXX=… для не-g++)
 
 # без Docker на Windows (docs/LOCAL_TEST.md §3б): рантайм в %USERPROFILE%\binsense-run
 powershell -ExecutionPolicy Bypass -File infra\windows\setup.ps1   # один раз
@@ -54,9 +54,6 @@ powershell -ExecutionPolicy Bypass -File infra\windows\start.ps1   # stop.ps1 �
 # прошивка и подготовка платы (адрес брокера — MQTT_PUBLIC_HOST или --mqtt-host)
 cd firmware && pio run -e esp8266 -t upload && pio device monitor   # HC-SR04: esp8266_hcsr04
 python tools/provision.py --api https://localhost --port COM5 --flash
-
-# схемы (без зависимостей)
-cd hardware/schematic && python make_schematic.py
 ```
 
 ## Архитектурные решения (не ломать, не «упрощать»)
@@ -89,7 +86,7 @@ cd hardware/schematic && python make_schematic.py
   `RECHECK_*` в `config.h`). Не возвращайте `lid_opens`/`lid_left_open`.
 - **Telegram-бота нет** (убран вместе с таблицами и полями пользователей —
   миграция `004_drop_telegram.sql`). События видны в веб-приложении: лента,
-  всплывающие предупреждения по WebSocket, кнопка «Принято». Не возвращайте
+  всплывающие предупреждения по WebSocket. Не возвращайте
   `bot/`, `notify.py`, `telegram_links` и `notifications`.
 - **Привязка — по коду, без наклеек и QR.** `provision.py` выводит код и
   ссылку `PUBLIC_URL/claim?id=…&code=…`, страница привязки заполняется из
@@ -98,13 +95,14 @@ cd hardware/schematic && python make_schematic.py
   в базе и на графиках только изменения; логика в
   `firmware/src/measure.cpp::shouldSend`.
 - **Настройки прошивки во флеше — одна структура с CRC** (`Storage::Data`,
-  эмуляция EEPROM). Меняете структуру — увеличьте `STORAGE_VERSION`.
+  эмуляция EEPROM). Меняете структуру — увеличьте `STORAGE_VERSION`, но
+  тогда перепрошивка сотрёт учётку MQTT и плату придётся заново готовить
+  `provision.py`. Поэтому удалённые поля `DeviceConfig` заменены резервом
+  (`reserved1`/`reserved2`), раскладку сторожит `static_assert`.
 - **В прошивке нет ArduinoJson**: свой `json_lite` — меньше памяти и логика
   тестируется на обычном компьютере.
-- **Схемы описаны кодом, а не нарисованы в редакторе.** Распиновка живёт в
-  одном списке (`make_schematic.py`). Проект KiCad пришлось бы править руками
-  при каждой правке пинов, и схема разошлась бы с прошивкой на первой же
-  итерации.
+- **Схему команда рисует сама**, генератора схем в репозитории нет (удалён).
+  Источник правды по распиновке — `hardware/WIRING.md` и флаги `-DPIN_*`.
 - **Корпус — готовая герметичная коробка**, своих деталей корпуса в проекте
   нет. Пункт 4 задания из-за этого не закрыт — см. `docs/REQUIREMENTS.md`.
 - Пароли — `hashlib.scrypt`, коды привязки — HMAC, без внешних библиотек.
@@ -117,12 +115,12 @@ cd hardware/schematic && python make_schematic.py
 |---|---|
 | Поле телеметрии | `firmware/src/main.cpp::buildTelemetry`, `backend/app/schemas.py::TelemetryIn`, таблицы `telemetry`/`device_metrics` (новая миграция), `docs/asyncapi.yaml`, `docs/PROTOCOL.md` |
 | Поле настроек устройства | `CONFIG_FIELDS` в `backend/app/devices.py`, `build_config_payload`, `DeviceUpdateIn`, `NetLink::applyConfig` и `Storage` в прошивке, форма в `frontend/src/pages/DevicePage.jsx`, asyncapi |
-| Новый тип события | `backend/app/rules.py` (спека), `frontend/src/lib/format.js` (`EVENT_TITLES`, `EVENT_ICONS`) |
+| Новый тип события | `backend/app/rules.py` (спека), `frontend/src/lib/format.js` (`EVENT_TITLES`, `EVENT_ICONS` — иконка из `lucide-react` и цвет) |
 | Формула заполненности | одинаково в `firmware/src/measure.cpp::fillPercent` и в калибровке на сервере — иначе устройство и карточка разойдутся |
 | Схема БД | только новым файлом `backend/migrations/00N_*.sql` (применяются по порядку, с advisory-lock) |
 | Панель Grafana | правьте `infra/grafana/make_dashboard.py` и перегенерируйте JSON, руками JSON не редактируйте |
 | Пины/плата | только флаги `-DPIN_*` в `firmware/platformio.ini`, код не трогать |
-| Распиновка | `PINS_LEFT`/`PINS_RIGHT` и `NETS` в `hardware/schematic/make_schematic.py`, таблица в `hardware/WIRING.md`, затем перегенерировать схемы |
+| Распиновка | таблица в `hardware/WIRING.md` и схема, которую рисует команда |
 | Слайды презентации | правятся в опубликованной презентации (генератора в репозитории нет); тезисы и вопросы — в `docs/presentation/README.md` |
 
 ## Соглашения
@@ -139,14 +137,14 @@ cd hardware/schematic && python make_schematic.py
 ## Текущее состояние
 
 Работает и проверено на локальном стенде: подготовка устройства → привязка по
-коду → retained-настройки → телеметрия → события → подтверждение → вывоз →
-история, прогноз, маршрут, метрики. Прошло 39 тестов сервера,
-58 проверок логики прошивки, сборка обоих вариантов прошивки настоящим
+коду → retained-настройки → телеметрия → события → вывоз →
+история, маршрут, метрики. Прошло 37 тестов сервера,
+51 проверка логики прошивки, сборка обоих вариантов прошивки настоящим
 тулчейном ESP8266 (PlatformIO), сборка фронтенда. Готовые образы — в
 `%USERPROFILE%\binsense-run\fw-release` на машине разработчика.
 
-Схемы: принципиальная (2 листа), монтажная и список цепей —
-`hardware/schematic/`. Презентация: 19 слайдов, опубликована отдельно;
+Схемы (принципиальную и монтажную) команда рисует сама, распиновка — в
+`hardware/WIRING.md`. Презентация: 19 слайдов, опубликована отдельно;
 тезисы и вопросы — в `docs/presentation/README.md`. Презентация и тезисы ещё
 описывают ESP32 с аккумулятором и Telegram-бота — их нужно обновить отдельно.
 
@@ -159,8 +157,16 @@ cd hardware/schematic && python make_schematic.py
 
 ## Известные шероховатости
 
-- Прогноз, объём контейнера и уровень Wi-Fi убраны из интерфейса (для демо
-  мало данных, объём ни на что не влияет); в API они остались — RSSI нужен Grafana.
+- Прогноз, объём контейнера, ночной режим и часовой пояс удалены целиком
+  (миграция `005_drop_unused_settings.sql`) — не возвращайте. Уровень Wi-Fi
+  не показывается в интерфейсе, но приходит в телеметрии и нужен Grafana.
+- Подтверждения событий («Принято») и формы «Подготовить устройство» в
+  интерфейсе нет. На сервере `POST /events/{id}/ack` остался, а
+  `POST /admin/devices` нужен `provision.py`.
+- События «Срочно вывезти» (`full_urgent`, уровень `critical`) больше нет —
+  миграция `006_drop_urgent.sql`. Фильтр в ленте — «Контейнер заполнен».
+- Карта по умолчанию — Иркутск (`MAP_CENTER`, резерв — `DEFAULT_MAP_CENTER`
+  в `frontend/src/lib/tiles.js`).
 - Плитки OpenStreetMap требуют интернета; для закрытого контура адрес слоя
   меняется в `frontend/src/lib/tiles.js`.
 - Геолокация на странице привязки работает только по HTTPS (или на

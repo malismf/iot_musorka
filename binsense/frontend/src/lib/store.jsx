@@ -1,6 +1,7 @@
 // Общее состояние приложения: пользователь, устройства, события, WebSocket.
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { api, getToken, setToken, wsUrl } from './api'
+import { DEFAULT_MAP_CENTER } from './tiles'
 
 const AppContext = createContext(null)
 
@@ -75,16 +76,6 @@ export function AppProvider({ children }) {
     await Promise.all([refreshDevices(), refreshEvents(), refreshStats()])
   }, [refreshDevices, refreshEvents, refreshStats])
 
-  const ackEvent = useCallback(
-    async (eventId) => {
-      const updated = await api(`/events/${eventId}/ack`, { method: 'POST' })
-      setEvents((list) => list.map((e) => (e.id === eventId ? updated : e)))
-      refreshStats().catch(() => {})
-      return updated
-    },
-    [refreshStats],
-  )
-
   const upsertDevice = useCallback((device) => {
     setDevices((list) => {
       const index = list.findIndex((d) => d.id === device.id)
@@ -99,7 +90,7 @@ export function AppProvider({ children }) {
   useEffect(() => {
     api('/config/public', { token: '' })
       .then(setPublicConfig)
-      .catch(() => setPublicConfig({ map_center: [55.7558, 37.6173], map_zoom: 12 }))
+      .catch(() => setPublicConfig({ map_center: DEFAULT_MAP_CENTER, map_zoom: 12 }))
   }, [])
 
   // профиль по сохранённому токену
@@ -158,14 +149,6 @@ export function AppProvider({ children }) {
             toast(payload.event.message, payload.event.severity)
           }
           refreshStats().catch(() => {})
-        } else if (payload.type === 'event_ack') {
-          setEvents((list) =>
-            list.map((e) =>
-              e.id === payload.event_id
-                ? { ...e, acked_at: new Date().toISOString(), acked_by_name: payload.acked_by }
-                : e,
-            ),
-          )
         }
       }
 
@@ -203,7 +186,6 @@ export function AppProvider({ children }) {
     refreshDevices,
     refreshEvents,
     refreshStats,
-    ackEvent,
     upsertDevice,
   }
 

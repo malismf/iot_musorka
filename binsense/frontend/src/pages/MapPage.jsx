@@ -1,23 +1,26 @@
 import L from 'leaflet'
+import { WifiOff } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
 import { useNavigate } from 'react-router-dom'
 import FillBar from '../components/FillBar'
 import { fillColor, fillLabel, statusLabel, timeAgo } from '../lib/format'
 import { useApp } from '../lib/store'
-import { TILE_ATTRIBUTION, TILE_URL } from '../lib/tiles'
+import { DEFAULT_MAP_CENTER, TILE_ATTRIBUTION, TILE_URL } from '../lib/tiles'
+
+// Leaflet принимает разметку метки строкой, поэтому иконку рендерим в HTML
+const OFFLINE_BADGE = `<div class="marker-badge">${renderToStaticMarkup(
+  <WifiOff size={11} strokeWidth={2.5} />,
+)}</div>`
 
 function markerIcon(device) {
   const label = device.fill === null || device.fill === undefined ? '?' : `${device.fill}`
-  const marks = []
-  if (!device.online) marks.push('📡')
   return L.divIcon({
     className: '',
     html:
       `<div class="bin-marker" style="background:${fillColor(device)}">${label}</div>` +
-      (marks.length
-        ? `<div style="position:absolute;top:-6px;right:-8px;font-size:13px">${marks.join('')}</div>`
-        : ''),
+      (device.online ? '' : OFFLINE_BADGE),
     iconSize: [38, 38],
     iconAnchor: [19, 19],
     popupAnchor: [0, -18],
@@ -45,7 +48,7 @@ export default function MapPage() {
   const [selected, setSelected] = useState(null)
   const [filter, setFilter] = useState('all')
 
-  const center = publicConfig?.map_center || [55.7558, 37.6173]
+  const center = publicConfig?.map_center || DEFAULT_MAP_CENTER
   const zoom = publicConfig?.map_zoom || 12
 
   const visible = useMemo(() => {

@@ -131,7 +131,6 @@ async def device(client, admin, fake_mqtt):
             "address": "ул. Тестовая, 1",
             "lat": 55.75,
             "lon": 37.61,
-            "volume_l": 1100,
         },
     )
     assert claim.status_code == 201, claim.text

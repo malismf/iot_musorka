@@ -1,3 +1,4 @@
+import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useApp } from '../lib/store'
@@ -34,7 +35,10 @@ export default function LoginPage() {
   return (
     <div className="auth-page">
       <div className="card auth-card">
-        <h1>🗑️ BinSense</h1>
+        <h1 className="title-with-icon">
+          <Trash2 className="logo-icon" size={26} aria-hidden="true" />
+          BinSense
+        </h1>
         <p className="muted small">Мониторинг заполненности мусорных контейнеров</p>
         <form onSubmit={submit}>
           {mode === 'register' && (

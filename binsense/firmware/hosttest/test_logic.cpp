@@ -72,23 +72,15 @@ static void testFill() {
   CHECK_EQ(fillPercent(500, 200, 250), -1, "некорректная калибровка");
 }
 
-static void testNightAndInterval() {
-  CHECK(isNightHour(2, 23, 7), "2 часа ночи попадает в интервал 23–7");
-  CHECK(isNightHour(23, 23, 7), "23 часа — начало ночи");
-  CHECK(!isNightHour(12, 23, 7), "полдень — не ночь");
-  CHECK(!isNightHour(-1, 23, 7), "время неизвестно — считаем, что не ночь");
-  CHECK(isNightHour(1, 0, 6), "интервал без перехода через полночь");
-
+static void testInterval() {
   DeviceConfig cfg;
   configDefaults(cfg);
-  CHECK_EQ(chooseIntervalS(cfg, 30, 12), DEFAULT_INTERVAL_S, "обычный интервал днём");
-  CHECK_EQ(chooseIntervalS(cfg, 30, 2), DEFAULT_NIGHT_INTERVAL_S, "ночью реже");
-  CHECK_EQ(chooseIntervalS(cfg, 95, 2), DEFAULT_FULL_INTERVAL_S,
-           "заполненный контейнер важнее ночного режима");
-  CHECK_EQ(chooseIntervalS(cfg, -1, 12), DEFAULT_INTERVAL_S,
+  CHECK_EQ(chooseIntervalS(cfg, 30), DEFAULT_INTERVAL_S, "обычный интервал");
+  CHECK_EQ(chooseIntervalS(cfg, 95), DEFAULT_FULL_INTERVAL_S, "заполненный контейнер — чаще");
+  CHECK_EQ(chooseIntervalS(cfg, -1), DEFAULT_INTERVAL_S,
            "без калибровки работаем по обычному интервалу");
   cfg.interval_s = 3;
-  CHECK_EQ(chooseIntervalS(cfg, 30, 12), 10, "интервал не меньше 10 секунд");
+  CHECK_EQ(chooseIntervalS(cfg, 30), 10, "интервал не меньше 10 секунд");
 }
 
 static void testShouldSend() {
@@ -119,7 +111,7 @@ static void testRecheck() {
 
 static void testJsonReader() {
   const char *config =
-      "{\"ver\":7,\"claimed\":true,\"interval_s\":900,\"night\":[23,7],\"tz\":\"MSK-3\","
+      "{\"ver\":7,\"claimed\":true,\"interval_s\":900,\"fw\":\"2.0.0\","
       "\"full_pct\":80,\"empty_mm\":982,\"name\":\"Площадка \\\"1\\\"\"}";
   long number = 0;
   bool flag = false;
@@ -128,11 +120,8 @@ static void testJsonReader() {
   CHECK(json::getInt(config, "ver", number) && number == 7, "чтение целого");
   CHECK(json::getBool(config, "claimed", flag) && flag, "чтение логического значения");
   CHECK(json::getInt(config, "empty_mm", number) && number == 982, "чтение калибровки");
-  CHECK(json::getString(config, "tz", text, sizeof(text)) && strcmp(text, "MSK-3") == 0,
+  CHECK(json::getString(config, "fw", text, sizeof(text)) && strcmp(text, "2.0.0") == 0,
         "чтение строки");
-  long night[2] = {0, 0};
-  CHECK(json::getIntArray(config, "night", night, 2) == 2 && night[0] == 23 && night[1] == 7,
-        "чтение массива");
   CHECK(!json::getInt(config, "missing", number), "отсутствующий ключ");
   CHECK(json::getString(config, "name", text, sizeof(text)), "строка с экранированием");
 
@@ -184,7 +173,7 @@ int main() {
   testMedian();
   testFrames();
   testFill();
-  testNightAndInterval();
+  testInterval();
   testShouldSend();
   testRecheck();
   testJsonReader();

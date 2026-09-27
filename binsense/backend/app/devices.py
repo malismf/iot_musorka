@@ -19,13 +19,9 @@ CONFIG_FIELDS = (
     "interval_s",
     "heartbeat_s",
     "full_interval_s",
-    "night_interval_s",
-    "night_start",
-    "night_end",
     "full_pct",
     "delta_pct",
     "samples",
-    "tz",
 )
 # Поля калибровки — живут в таблице devices, но тоже уходят в настройках
 CALIBRATION_FIELDS = ("empty_mm", "full_mm")
@@ -36,13 +32,9 @@ def default_config() -> dict[str, Any]:
         "interval_s": settings.default_interval_s,
         "heartbeat_s": settings.default_heartbeat_s,
         "full_interval_s": settings.default_full_interval_s,
-        "night_interval_s": settings.default_night_interval_s,
-        "night_start": settings.default_night_start,
-        "night_end": settings.default_night_end,
         "full_pct": settings.default_full_pct,
         "delta_pct": settings.default_delta_pct,
         "samples": settings.default_samples,
-        "tz": settings.default_tz,
     }
 
 
@@ -55,9 +47,6 @@ def build_config_payload(device: asyncpg.Record | dict, version: int, config: di
         "interval_s": merged["interval_s"],
         "heartbeat_s": merged["heartbeat_s"],
         "full_interval_s": merged["full_interval_s"],
-        "night_interval_s": merged["night_interval_s"],
-        "night": [merged["night_start"], merged["night_end"]],
-        "tz": merged["tz"],
         "full_pct": merged["full_pct"],
         "delta_pct": merged["delta_pct"],
         "samples": merged["samples"],
@@ -92,7 +81,6 @@ def device_to_out(row: asyncpg.Record | dict) -> DeviceOut:
         address=row["address"],
         lat=row["lat"],
         lon=row["lon"],
-        volume_l=row["volume_l"],
         status=row["status"],
         online=row["online"],
         fill=row["last_fill"],

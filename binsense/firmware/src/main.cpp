@@ -59,14 +59,6 @@ static void queueSimpleEvent(const char *type, const char *key = nullptr,
   queueEvent(buffer);
 }
 
-static int localHour() {
-  time_t now = time(nullptr);
-  if (now < 1700000000) return -1;
-  struct tm info;
-  localtime_r(&now, &info);
-  return info.tm_hour;
-}
-
 static uint32_t secondsSinceSend() {
   if (!sentOnce) return 0xFFFFFFFFu;
   return (millis() - lastSentMs) / 1000;
@@ -131,7 +123,6 @@ static void handleConfig() {
   bool wasClaimed = cfg.claimed;
   if (!net.applyConfig(cfg)) return;
   storage.saveConfig(cfg);
-  NetLink::applyTimezone(cfg.tz);
   if (cfg.claimed && !wasClaimed) {
     Serial.println("[net] устройство привязано к аккаунту");
     indicator.stopBlinking();
@@ -140,7 +131,7 @@ static void handleConfig() {
     indicator.beep(2);
   }
   // новый интервал может оказаться короче — не ждём старого
-  uint32_t soon = millis() + chooseIntervalS(cfg, lastSentFill, localHour()) * 1000UL;
+  uint32_t soon = millis() + chooseIntervalS(cfg, lastSentFill) * 1000UL;
   if ((int32_t)(nextMeasureMs - soon) > 0) nextMeasureMs = soon;
 }
 
@@ -212,7 +203,7 @@ static bool measureCycle() {
     Serial.println("[измерение] изменений нет — не отправляю");
   }
   wakeReason = "timer";
-  scheduleMeasure(chooseIntervalS(cfg, measurement.fill, localHour()));
+  scheduleMeasure(chooseIntervalS(cfg, measurement.fill));
   return sent;
 }
 
@@ -319,7 +310,6 @@ void setup() {
   storage.begin();
   storage.loadConfig(cfg);
   storage.loadCredentials(creds);
-  NetLink::applyTimezone(cfg.tz);
   sensor.begin();
   bootId = board.random32();
   Serial.printf("\n[старт] %s fw=%s hw=%s причина=%s\n", deviceId(), FW_VERSION, HW_NAME,
@@ -355,7 +345,7 @@ void setup() {
     wakeReason = "setup";
   }
 
-  net.begin(cfg.tz);
+  net.begin();
   nextMeasureMs = millis();  // первый замер сразу
 }
 

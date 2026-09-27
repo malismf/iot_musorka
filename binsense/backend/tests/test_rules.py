@@ -1,11 +1,11 @@
-"""Тесты правил, прогноза и вспомогательных функций (без базы и брокера)."""
+"""Тесты правил и вспомогательных функций (без базы и брокера)."""
 from __future__ import annotations
 
 import datetime as dt
 
 from app.api.routes.stats import google_maps_urls, haversine
-from app.forecast import forecast_fill, linear_fit
-from app.rules import evaluate_telemetry, evaluate_urgent, offline_event
+from app.devices import build_config_payload
+from app.rules import evaluate_telemetry, offline_event
 from app.schemas import RouteStop
 from app.security import (
     create_token,
@@ -44,10 +44,9 @@ def test_collected_after_full():
     events, state = evaluate_telemetry(DEVICE, state, fill=6, full_pct=80)
     types = [e.type for e in events]
     assert types == ["collected"]
-    assert events[0].resolves == ("full", "full_urgent")
+    assert events[0].resolves == ("full",)
     assert state["full_active"] is False
     assert state["max_fill"] == 6
-    assert "last_collection" in state
 
 
 def test_uncalibrated_device_has_no_fill_events():
@@ -56,49 +55,11 @@ def test_uncalibrated_device_has_no_fill_events():
     assert "max_fill" not in state
 
 
-def test_urgent_requires_time_and_no_ack():
-    long_ago = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=3)).isoformat()
-    state = {"full_active": True, "full_since": long_ago, "urgent_sent": False}
-    device = {**DEVICE, "last_fill": 97}
-
-    events, new_state = evaluate_urgent(device, state, full_ack_at=None)
-    assert [e.type for e in events] == ["full_urgent"]
-    assert new_state["urgent_sent"] is True
-
-    # если событие уже подтвердили, срочного уведомления быть не должно
-    events, _ = evaluate_urgent(device, state, full_ack_at=dt.datetime.now(dt.timezone.utc))
-    assert events == []
-
-    # и если контейнер заполнен недавно
-    fresh = {**state, "full_since": dt.datetime.now(dt.timezone.utc).isoformat()}
-    events, _ = evaluate_urgent(device, fresh, full_ack_at=None)
-    assert events == []
-
-
 def test_offline_event_message():
     spec = offline_event(DEVICE, 7200)
     assert spec.type == "offline"
     assert "Площадка №1" in spec.message
     assert spec.severity == "warning"
-
-
-def test_forecast():
-    now = dt.datetime.now(dt.timezone.utc)
-    points = [(now - dt.timedelta(hours=10 - i), 10.0 + i * 5) for i in range(10)]
-    result = forecast_fill(points, current_fill=55, full_pct=80)
-    assert result["rate_pct_per_day"] is not None
-    assert 4 < result["hours_to_full"] < 6  # растёт на 5 %/час, осталось 25 %
-    assert result["eta"] > now
-
-
-def test_forecast_edge_cases():
-    assert forecast_fill([], None, 80)["note"] == "устройство не откалибровано"
-    assert forecast_fill([], 90, 80)["hours_to_full"] == 0
-    assert forecast_fill([], 10, 80)["note"] == "мало данных для прогноза"
-    now = dt.datetime.now(dt.timezone.utc)
-    flat = [(now - dt.timedelta(hours=3 - i), 20.0) for i in range(3)]
-    assert forecast_fill(flat, 20, 80)["note"] == "заполнение не растёт"
-    assert linear_fit(flat) == (0.0, 20.0)
 
 
 def test_route_links():
@@ -145,3 +106,16 @@ def test_jwt():
     payload = decode_token(token)
     assert payload["sub"] == "7"
     assert payload["role"] == "admin"
+
+
+def test_config_payload_fields():
+    device = {"status": "active", "empty_mm": 980, "full_mm": 250}
+    # ключи, оставшиеся в базе от старых версий, устройству не уходят
+    stored = {"interval_s": 60, "night_start": 23, "tz": "MSK-3"}
+    payload = build_config_payload(device, 5, stored)
+    assert set(payload) == {
+        "ver", "claimed", "interval_s", "heartbeat_s", "full_interval_s",
+        "full_pct", "delta_pct", "samples", "empty_mm", "full_mm",
+    }
+    assert payload["interval_s"] == 60
+    assert payload["claimed"] is True

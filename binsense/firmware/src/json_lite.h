@@ -14,8 +14,6 @@ namespace json {
 bool getInt(const char *doc, const char *key, long &out);
 bool getBool(const char *doc, const char *key, bool &out);
 bool getString(const char *doc, const char *key, char *out, size_t maxLen);
-// Массив целых чисел, например "night":[23,7]
-size_t getIntArray(const char *doc, const char *key, long *out, size_t maxItems);
 
 // Сборка JSON в заранее выделенный буфер (без динамической памяти).
 class Writer {

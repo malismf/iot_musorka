@@ -36,26 +36,20 @@ class Settings(BaseSettings):
     mqtt_topic_prefix: str = "bins"
 
     # --- Карта ---------------------------------------------------------------
-    map_center: str = "55.7558,37.6173"
+    map_center: str = "52.287,104.281"             # Иркутск
     map_zoom: int = 12
 
     # --- Настройки устройств по умолчанию ------------------------------------
-    default_interval_s: int = 900                 # обычный интервал сна, 15 мин
+    default_interval_s: int = 900                 # обычный интервал замеров, 15 мин
     default_heartbeat_s: int = 7200               # обязательная отправка раз в 2 часа
     default_full_interval_s: int = 300            # интервал, когда контейнер заполнен
-    default_night_interval_s: int = 1800
-    default_night_start: int = 23
-    default_night_end: int = 7
     default_full_pct: int = 80
     default_delta_pct: int = 3                    # порог изменения для отправки
     default_samples: int = 7
-    default_tz: str = "MSK-3"                     # POSIX TZ для устройства
     default_full_mm: int = 250                    # мёртвая зона датчика + запас
 
     # --- Правила событий -----------------------------------------------------
     offline_factor: float = 1.5                   # нет связи дольше heartbeat * factor
-    urgent_fill: int = 95
-    urgent_delay_min: int = 120                   # если событие не подтверждено N минут
     collected_low_pct: int = 15                   # вывоз: было >= high, стало <= low
     collected_high_pct: int = 50
 
@@ -74,7 +68,7 @@ class Settings(BaseSettings):
             lat, lon = self.map_center.split(",")
             return float(lat), float(lon)
         except ValueError:
-            return 55.7558, 37.6173
+            return 52.287, 104.281
 
 
 @lru_cache

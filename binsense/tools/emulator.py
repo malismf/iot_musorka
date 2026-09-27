@@ -189,7 +189,6 @@ def ensure_devices(api_client: httpx.Client, count: int, center, radius_km: floa
                 "address": f"{random.choice(STREETS)}, {random.randint(1, 80)}",
                 "lat": round(lat, 6),
                 "lon": round(lon, 6),
-                "volume_l": random.choice([660, 770, 1100]),
             },
         )
         if claim.status_code >= 400 and claim.status_code != 409:
@@ -213,7 +212,7 @@ def main() -> None:
     parser.add_argument("--mqtt-host", default=os.getenv("MQTT_HOST", "localhost"))
     parser.add_argument("--mqtt-port", type=int, default=int(os.getenv("MQTT_PORT", "1883")))
     parser.add_argument("--count", type=int, default=10)
-    parser.add_argument("--center", default="55.7558,37.6173", help="центр района, lat,lon")
+    parser.add_argument("--center", default="52.287,104.281", help="центр района, lat,lon")
     parser.add_argument("--radius-km", type=float, default=2.0)
     parser.add_argument("--speed", type=float, default=120.0,
                         help="во сколько раз время идёт быстрее реального")

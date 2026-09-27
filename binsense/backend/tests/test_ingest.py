@@ -170,25 +170,6 @@ async def test_offline_detection(ingestor, pool, device):
     assert offline_event["resolved_at"] is not None
 
 
-async def test_urgent_escalation(ingestor, pool, device):
-    device_id = device["device_id"]
-    await ingestor.handle_telemetry(device_id, telemetry(fill=97))
-    assert await ingestor.check_urgent() == 0  # ещё не прошло два часа
-
-    await pool.execute(
-        """UPDATE devices
-              SET state = jsonb_set(state, '{full_since}',
-                                    to_jsonb((now() - interval '3 hours')::text))
-            WHERE id = $1""",
-        device_id,
-    )
-    assert await ingestor.check_urgent() == 1
-    event = await pool.fetchrow("SELECT * FROM events WHERE type = 'full_urgent'")
-    assert event["severity"] == "critical"
-    # второй раз не повторяем
-    assert await ingestor.check_urgent() == 0
-
-
 async def test_cleanup_removes_old_rows(ingestor, pool, device):
     device_id = device["device_id"]
     await pool.execute(

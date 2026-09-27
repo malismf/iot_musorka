@@ -40,20 +40,9 @@ int fillPercent(int distance_mm, uint32_t empty_mm, uint32_t full_mm) {
   return (int)value;
 }
 
-bool isNightHour(int hour, uint8_t start, uint8_t end) {
-  if (hour < 0) return false;
-  if (start == end) return false;
-  if (start < end) return hour >= start && hour < end;
-  return hour >= start || hour < end;  // интервал через полночь
-}
-
-uint32_t chooseIntervalS(const DeviceConfig &cfg, int fill, int localHour) {
+uint32_t chooseIntervalS(const DeviceConfig &cfg, int fill) {
   uint32_t interval = cfg.interval_s;
-  if (fill >= 0 && fill >= cfg.full_pct) {
-    interval = cfg.full_interval_s;  // заполненный контейнер проверяем чаще
-  } else if (isNightHour(localHour, cfg.night_start, cfg.night_end)) {
-    interval = cfg.night_interval_s;  // ночью мусор почти не появляется
-  }
+  if (fill >= 0 && fill >= cfg.full_pct) interval = cfg.full_interval_s;
   if (interval < 10) interval = 10;
   if (interval > 24 * 3600) interval = 24 * 3600;
   return interval;

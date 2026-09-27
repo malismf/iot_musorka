@@ -87,6 +87,17 @@ h3 {
   color: var(--text);
 }
 
+.logo-icon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.title-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .nav {
   display: flex;
   gap: 4px;
@@ -201,6 +212,12 @@ button.primary:hover:not(:disabled) {
 button.danger {
   color: var(--danger);
   border-color: #fecaca;
+}
+
+button.with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 button.small,
@@ -387,6 +404,21 @@ tbody tr:hover {
   font-size: 12px;
 }
 
+.marker-badge {
+  position: absolute;
+  top: -5px;
+  right: -7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #475569;
+  border: 2px solid #fff;
+  color: #fff;
+}
+
 .device-mini {
   display: flex;
   gap: 10px;
@@ -423,10 +455,6 @@ tbody tr:hover {
 
 .toast.warning {
   background: #a16207;
-}
-
-.toast.critical {
-  background: #b91c1c;
 }
 
 .auth-page {
@@ -466,8 +494,9 @@ tbody tr:hover {
 }
 
 .event-icon {
-  font-size: 18px;
-  line-height: 1.2;
+  display: flex;
+  flex-shrink: 0;
+  padding-top: 1px;
 }
 
 .tabs {

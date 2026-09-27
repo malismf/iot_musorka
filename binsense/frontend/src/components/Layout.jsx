@@ -1,25 +1,26 @@
+import { Trash2 } from 'lucide-react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useApp } from '../lib/store'
 
 export default function Layout() {
-  const { user, logout, stats } = useApp()
+  const { user, logout } = useApp()
   const location = useLocation()
   const wideMap = location.pathname === '/'
 
   return (
     <div className="app">
       <header className="header">
-        <div className="logo">🗑️ BinSense</div>
+        <div className="logo">
+          <Trash2 className="logo-icon" size={22} aria-hidden="true" />
+          BinSense
+        </div>
         <nav className="nav">
           <NavLink to="/" end>
             Карта
           </NavLink>
           <NavLink to="/list">Список</NavLink>
-          <NavLink to="/events">
-            События
-            {stats && stats.open_events > 0 ? ` (${stats.open_events})` : ''}
-          </NavLink>
-          <NavLink to="/claim">Добавить</NavLink>
+          <NavLink to="/events">События</NavLink>
+          {user?.role !== 'driver' && <NavLink to="/claim">Добавить</NavLink>}
           {user?.role === 'admin' && <NavLink to="/admin">Админ</NavLink>}
         </nav>
         <NavLink to="/profile" className="small muted">

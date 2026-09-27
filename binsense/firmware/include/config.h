@@ -79,16 +79,12 @@
 #define DEFAULT_INTERVAL_S 900
 #define DEFAULT_HEARTBEAT_S 7200
 #define DEFAULT_FULL_INTERVAL_S 300
-#define DEFAULT_NIGHT_INTERVAL_S 1800
-#define DEFAULT_NIGHT_START 23
-#define DEFAULT_NIGHT_END 7
 #define DEFAULT_FULL_PCT 80
 #define DEFAULT_DELTA_PCT 3
 #define DEFAULT_SAMPLES 7
 #ifndef DEFAULT_FULL_MM
 #define DEFAULT_FULL_MM 250
 #endif
-#define DEFAULT_TZ "MSK-3"
 
 #ifndef MQTT_DEFAULT_PORT
 #define MQTT_DEFAULT_PORT 1883
@@ -101,16 +97,18 @@ struct DeviceConfig {
   uint32_t interval_s;
   uint32_t heartbeat_s;
   uint32_t full_interval_s;
-  uint32_t night_interval_s;
-  uint8_t night_start;
-  uint8_t night_end;
+  uint8_t reserved1[6];  // место убранного ночного режима: раскладка флеша не меняется
   uint8_t full_pct;
   uint8_t delta_pct;
   uint8_t samples;
   uint32_t empty_mm;  // расстояние до дна пустого контейнера (калибровка)
   uint32_t full_mm;   // расстояние, считающееся 100 %
-  char tz[40];
+  char reserved2[40];    // место убранного часового пояса
 };
+// Иначе после перепрошивки Storage не узнает старые данные и сотрёт учётку MQTT
+static_assert(offsetof(DeviceConfig, full_pct) == 26 && offsetof(DeviceConfig, empty_mm) == 32 &&
+                  sizeof(DeviceConfig) == 80,
+              "раскладка DeviceConfig должна совпадать с записанной во флеш");
 
 struct Credentials {
   char host[64];
@@ -134,16 +132,11 @@ inline void configDefaults(DeviceConfig &cfg) {
   cfg.interval_s = DEFAULT_INTERVAL_S;
   cfg.heartbeat_s = DEFAULT_HEARTBEAT_S;
   cfg.full_interval_s = DEFAULT_FULL_INTERVAL_S;
-  cfg.night_interval_s = DEFAULT_NIGHT_INTERVAL_S;
-  cfg.night_start = DEFAULT_NIGHT_START;
-  cfg.night_end = DEFAULT_NIGHT_END;
+  for (size_t i = 0; i < sizeof(cfg.reserved1); i++) cfg.reserved1[i] = 0;
   cfg.full_pct = DEFAULT_FULL_PCT;
   cfg.delta_pct = DEFAULT_DELTA_PCT;
   cfg.samples = DEFAULT_SAMPLES;
   cfg.empty_mm = 0;
   cfg.full_mm = DEFAULT_FULL_MM;
-  const char *tz = DEFAULT_TZ;
-  size_t i = 0;
-  for (; tz[i] && i < sizeof(cfg.tz) - 1; i++) cfg.tz[i] = tz[i];
-  cfg.tz[i] = '\0';
+  for (size_t i = 0; i < sizeof(cfg.reserved2); i++) cfg.reserved2[i] = 0;
 }

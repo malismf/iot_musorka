@@ -1,4 +1,4 @@
-"""Устройства: список, карточка, привязка, настройки, история, прогноз."""
+"""Устройства: список, карточка, привязка, настройки, история."""
 from __future__ import annotations
 
 import datetime as dt
@@ -17,14 +17,12 @@ from ...devices import (
     log_action,
 )
 from ...events import broadcast, store_event
-from ...forecast import forecast_fill
 from ...rules import EventSpec
 from ...schemas import (
     ClaimIn,
     DeviceOut,
     DeviceUpdateIn,
     EventOut,
-    ForecastOut,
     TelemetryPoint,
 )
 from ...security import verify_claim_code
@@ -109,7 +107,7 @@ async def claim_device(body: ClaimIn, pool: PoolDep, user: EditorDep, request: R
         """
         UPDATE devices
            SET owner_id = $2, status = 'active', name = $3, address = $4,
-               lat = $5, lon = $6, volume_l = $7,
+               lat = $5, lon = $6,
                claim_attempts = 0, claim_locked_until = NULL, claimed_at = now()
          WHERE id = $1
         """,
@@ -119,7 +117,6 @@ async def claim_device(body: ClaimIn, pool: PoolDep, user: EditorDep, request: R
         body.address,
         body.lat,
         body.lon,
-        body.volume_l,
     )
     await bump_config(pool, body.device_id)  # публикует claimed = true
     await log_action(pool, user["id"], "claim", body.device_id, ip=client_ip(request))
@@ -155,10 +152,18 @@ async def update_device(
     patch = body.model_dump(exclude_unset=True, exclude_none=True)
     card_fields = {
         k: v for k, v in patch.items()
-        if k in ("name", "address", "lat", "lon", "volume_l")
+        if k in ("name", "address", "lat", "lon")
     }
-    calibration = {k: v for k, v in patch.items() if k in CALIBRATION_FIELDS}
-    config_changes = {k: v for k, v in patch.items() if k in CONFIG_FIELDS}
+    # Новая версия настроек — только если значение для устройства действительно
+    # изменилось: форма присылает все поля сразу, а карточка (название, место)
+    # хранится лишь на сервере
+    current = {**default_config(), **(row["config"] or {})}
+    calibration = {
+        k: v for k, v in patch.items() if k in CALIBRATION_FIELDS and row[k] != v
+    }
+    config_changes = {
+        k: v for k, v in patch.items() if k in CONFIG_FIELDS and current.get(k) != v
+    }
 
     if card_fields or calibration:
         updates = {**card_fields, **calibration}
@@ -297,37 +302,3 @@ async def device_events(
         limit,
     )
     return [EventOut(**dict(r)) for r in rows]
-
-
-@router.get("/{device_id}/forecast", response_model=ForecastOut)
-async def device_forecast(device_id: str, pool: PoolDep, user: UserDep) -> ForecastOut:
-    device_id = device_id.lower()
-    device = await fetch_device(pool, device_id)
-    if device is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Устройство не найдено")
-
-    config = {**default_config(), **(device["config"] or {})}
-    state = device["state"] or {}
-    since = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=7)
-    last_collection = state.get("last_collection")
-    if last_collection:
-        try:
-            since = max(since, dt.datetime.fromisoformat(last_collection))
-        except ValueError:
-            pass
-
-    rows = await pool.fetch(
-        """
-        SELECT ts, fill FROM telemetry
-         WHERE device_id = $1 AND ts >= $2 AND fill IS NOT NULL
-         ORDER BY ts
-        """,
-        device_id,
-        since,
-    )
-    result = forecast_fill(
-        [(r["ts"], float(r["fill"])) for r in rows],
-        device["last_fill"],
-        int(config["full_pct"]),
-    )
-    return ForecastOut(device_id=device_id, fill=device["last_fill"], **result)

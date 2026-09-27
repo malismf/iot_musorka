@@ -1,32 +1,22 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { EVENT_ICONS, EVENT_TITLES, formatDateTime } from '../lib/format'
+import EventIcon from '../components/EventIcon'
+import { EVENT_TITLES, formatDateTime } from '../lib/format'
 import { useApp } from '../lib/store'
 
 const FILTERS = [
   { key: 'all', title: 'Все' },
-  { key: 'open', title: 'Неподтверждённые' },
-  { key: 'critical', title: 'Критичные' },
+  { key: 'full', title: EVENT_TITLES.full },
 ]
 
 export default function EventsPage() {
-  const { events, ackEvent, toast } = useApp()
+  const { events } = useApp()
   const [filter, setFilter] = useState('all')
 
   const rows = useMemo(() => {
-    if (filter === 'open') return events.filter((e) => e.needs_ack && !e.acked_at)
-    if (filter === 'critical') return events.filter((e) => e.severity === 'critical')
-    return events
+    if (filter === 'all') return events
+    return events.filter((e) => e.type === filter)
   }, [events, filter])
-
-  const ack = async (event) => {
-    try {
-      await ackEvent(event.id)
-      toast('Событие подтверждено')
-    } catch (err) {
-      toast(err.message, 'warning')
-    }
-  }
 
   return (
     <div className="card">
@@ -50,7 +40,7 @@ export default function EventsPage() {
 
       {rows.map((event) => (
         <div key={event.id} className="event-row">
-          <span className="event-icon">{EVENT_ICONS[event.type] || 'ℹ️'}</span>
+          <EventIcon type={event.type} />
           <div style={{ flex: 1 }}>
             <div className="row" style={{ gap: 8 }}>
               <b>{EVENT_TITLES[event.type] || event.type}</b>
@@ -64,17 +54,9 @@ export default function EventsPage() {
             <div className="small">{event.message}</div>
             <div className="small muted">
               {formatDateTime(event.created_at)}
-              {event.acked_at
-                ? ` · подтверждено ${event.acked_by_name || ''} ${formatDateTime(event.acked_at)}`
-                : ''}
               {event.resolved_at ? ' · закрыто' : ''}
             </div>
           </div>
-          {event.needs_ack && !event.acked_at && (
-            <button className="small" onClick={() => ack(event)}>
-              Принято
-            </button>
-          )}
         </div>
       ))}
     </div>
@@ -82,7 +64,6 @@ export default function EventsPage() {
 }
 
 function severityClass(severity) {
-  if (severity === 'critical') return 'danger'
   if (severity === 'warning') return 'warn'
   return 'info'
 }

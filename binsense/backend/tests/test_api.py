@@ -96,7 +96,6 @@ async def test_claim_flow(client, admin, fake_mqtt):
             "address": "ул. Ленина, 7",
             "lat": 55.75,
             "lon": 37.61,
-            "volume_l": 770,
         },
     )
     assert good.status_code == 201
@@ -154,6 +153,32 @@ async def test_update_device_bumps_config(client, device, fake_mqtt):
     assert published["interval_s"] == 600
     assert published["empty_mm"] == 1000
     assert published["ver"] == updated["config_version"]
+
+
+async def test_update_without_device_changes_keeps_version(client, device, fake_mqtt):
+    device_id = device["device_id"]
+    before = (await client.get(f"/api/devices/{device_id}")).json()
+    published_before = dict(fake_mqtt.configs.get(device_id, {}))
+
+    # название и место живут только на сервере, остальное совпадает с текущим
+    response = await client.patch(
+        f"/api/devices/{device_id}",
+        json={
+            "name": "Площадка у школы",
+            "address": "ул. Школьная, 3",
+            "lat": 55.7,
+            "lon": 37.6,
+            "full_pct": before["config"]["full_pct"],
+            "interval_s": before["config"]["interval_s"],
+            "empty_mm": before["empty_mm"],
+        },
+    )
+    assert response.status_code == 200
+    updated = response.json()
+    assert updated["name"] == "Площадка у школы"
+    assert updated["lat"] == 55.7
+    assert updated["config_version"] == before["config_version"]
+    assert fake_mqtt.configs.get(device_id, {}) == published_before
 
 
 async def test_unclaim(client, device, fake_mqtt):
@@ -234,9 +259,6 @@ async def test_telemetry_history_and_route(client, device, pool):
     route = (await client.get("/api/route", params={"min_fill": 80})).json()
     assert [stop["device_id"] for stop in route["stops"]] == [device_id]
     assert route["map_urls"]
-
-    forecast = (await client.get(f"/api/devices/{device_id}/forecast")).json()
-    assert forecast["device_id"] == device_id
 
 
 async def test_admin_users_and_audit(client, admin, device):

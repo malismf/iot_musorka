@@ -15,7 +15,7 @@ const char *deviceId();
 
 class NetLink {
  public:
-  void begin(const char *tz);
+  void begin();
   // Поддерживает подключение; возвращает true, если брокер доступен.
   bool maintain(const char *ssid, const char *pass, const Credentials &creds);
   // Портал настройки: устройство поднимает точку доступа BinSense-XXXX.
@@ -25,7 +25,6 @@ class NetLink {
   int rssi();
   uint32_t wifiMs() const { return wifiMs_; }
   uint32_t mqttMs() const { return mqttMs_; }
-  static void applyTimezone(const char *tz);
 
   // Разбирает полученные настройки. true — пришло что-то новое.
   bool applyConfig(DeviceConfig &cfg);

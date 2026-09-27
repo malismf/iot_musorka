@@ -49,7 +49,6 @@ void Storage::loadConfig(DeviceConfig &cfg) {
     return;
   }
   cfg = data_.cfg;
-  cfg.tz[sizeof(cfg.tz) - 1] = '\0';
   if (cfg.samples > SENSOR_MAX_SAMPLES) cfg.samples = SENSOR_MAX_SAMPLES;
   if (cfg.samples == 0) cfg.samples = 1;
 }

@@ -161,9 +161,6 @@ components:
             interval_s: 900
             heartbeat_s: 7200
             full_interval_s: 300
-            night_interval_s: 1800
-            night: [23, 7]
-            tz: MSK-3
             full_pct: 80
             delta_pct: 3
             samples: 7
@@ -261,18 +258,6 @@ components:
         full_interval_s:
           type: integer
           description: Интервал, когда контейнер заполнен
-        night_interval_s:
-          type: integer
-        night:
-          type: array
-          items:
-            type: integer
-          minItems: 2
-          maxItems: 2
-          description: Часы ночного режима, [начало, конец]
-        tz:
-          type: string
-          description: Часовой пояс в формате POSIX TZ, например MSK-3
         full_pct:
           type: integer
           description: Порог «контейнер заполнен», %

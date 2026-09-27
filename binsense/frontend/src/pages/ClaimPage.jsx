@@ -7,7 +7,7 @@ import { useApp } from '../lib/store'
 export default function ClaimPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
-  const { publicConfig, toast, refreshAll } = useApp()
+  const { publicConfig, toast, refreshAll, user } = useApp()
   const [deviceId, setDeviceId] = useState(params.get('id') || '')
   const [code, setCode] = useState((params.get('code') || '').toUpperCase())
   const [name, setName] = useState('')
@@ -52,14 +52,14 @@ export default function ClaimPage() {
     }
   }
 
+  if (user?.role === 'driver') {
+    return <div className="card">Добавлять устройства может администратор или диспетчер.</div>
+  }
+
   return (
     <div className="grid cols-2">
       <form className="card" onSubmit={submit}>
         <h1>Добавить устройство</h1>
-        <p className="muted small">
-          Идентификатор и код привязки печатает <code>tools/provision.py</code> при подготовке
-          устройства. Если открыть ссылку привязки из его вывода, поля заполнятся сами.
-        </p>
 
         <label className="field">
           <span>Идентификатор устройства</span>

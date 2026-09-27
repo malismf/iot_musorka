@@ -40,7 +40,7 @@ docker compose up -d --build
 `docker compose up -d --build` поднимает и собирает образы: `db` (PostgreSQL
 16), `mqtt` (Mosquitto 2 с dynamic-security и ролью на устройство), `api`
 (FastAPI, `backend/Dockerfile`), `ingestor` (тот же образ, `app.ingestor`),
-`bot` (тот же образ, `app.bot`), `web` (сборка React + Caddy по
+`web` (сборка React + Caddy по
 `frontend/Dockerfile`), `grafana`. Миграции из `backend/migrations/`
 применяются самим приложением при старте (`app/db.py`), отдельно их
 запускать не нужно.
@@ -138,16 +138,6 @@ TEST_DATABASE_URL=postgresql://binsense:ПАРОЛЬ@localhost:5432/binsense_tes
 ```bash
 cd firmware/hosttest
 ./run.sh                 # CXX=clang++ и т. п., если не g++
-```
-
-## 6. Схемы (опционально)
-
-Принципиальная и монтажная схемы генерируются кодом, без внешних
-зависимостей:
-
-```bash
-cd hardware/schematic
-python make_schematic.py   # результат — SVG в hardware/schematic/
 ```
 
 ## Итоговая проверка «всё собралось»

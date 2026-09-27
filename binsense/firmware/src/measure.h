@@ -15,8 +15,8 @@ bool parseUartFrame(const uint8_t *data, int length, int &distance_mm, int *cons
 // Заполненность в процентах. Возвращает -1, если калибровки нет или данные неверные.
 int fillPercent(int distance_mm, uint32_t empty_mm, uint32_t full_mm);
 
-// Интервал до следующего замера с учётом заполненности и ночного режима.
-uint32_t chooseIntervalS(const DeviceConfig &cfg, int fill, int localHour);
+// Интервал до следующего замера: заполненный контейнер проверяется чаще.
+uint32_t chooseIntervalS(const DeviceConfig &cfg, int fill);
 
 // Нужно ли отправлять данные на сервер прямо сейчас.
 bool shouldSend(const DeviceConfig &cfg, int fill, int lastSentFill, uint32_t secondsSinceSend,
@@ -25,9 +25,6 @@ bool shouldSend(const DeviceConfig &cfg, int fill, int lastSentFill, uint32_t se
 // Датчика крышки нет, поэтому замер мог попасть на открытую крышку. Резкий скачок
 // уровня (или сбой датчика) перепроверяется повторным замером через RECHECK_DELAY_S.
 bool needsRecheck(int fill, int lastSentFill, bool sensorError);
-
-// Проверка, попадает ли час в ночной интервал (start может быть больше end).
-bool isNightHour(int hour, uint8_t start, uint8_t end);
 
 // Удобная обёртка: заполненность по текущей калибровке устройства.
 inline int fillPercentSafe(int distance_mm, const DeviceConfig &cfg) {

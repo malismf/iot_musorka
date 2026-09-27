@@ -110,7 +110,6 @@ class DeviceOut(BaseModel):
     address: Optional[str] = None
     lat: Optional[float] = None
     lon: Optional[float] = None
-    volume_l: Optional[int] = None
     status: str
     online: bool
     fill: Optional[int] = None
@@ -141,7 +140,6 @@ class ClaimIn(BaseModel):
     address: str = Field(default="", max_length=250)
     lat: Optional[float] = Field(default=None, ge=-90, le=90)
     lon: Optional[float] = Field(default=None, ge=-180, le=180)
-    volume_l: Optional[int] = Field(default=None, ge=1, le=100000)
 
     @field_validator("device_id")
     @classmethod
@@ -160,20 +158,15 @@ class DeviceUpdateIn(BaseModel):
     address: Optional[str] = Field(default=None, max_length=250)
     lat: Optional[float] = Field(default=None, ge=-90, le=90)
     lon: Optional[float] = Field(default=None, ge=-180, le=180)
-    volume_l: Optional[int] = Field(default=None, ge=1, le=100000)
     # настройки, уезжающие на устройство
     interval_s: Optional[int] = Field(default=None, ge=10, le=86400)
     heartbeat_s: Optional[int] = Field(default=None, ge=60, le=86400)
     full_interval_s: Optional[int] = Field(default=None, ge=10, le=86400)
-    night_interval_s: Optional[int] = Field(default=None, ge=10, le=86400)
-    night_start: Optional[int] = Field(default=None, ge=0, le=23)
-    night_end: Optional[int] = Field(default=None, ge=0, le=23)
     full_pct: Optional[int] = Field(default=None, ge=10, le=100)
     delta_pct: Optional[int] = Field(default=None, ge=0, le=50)
     samples: Optional[int] = Field(default=None, ge=1, le=31)
     empty_mm: Optional[int] = Field(default=None, ge=50, le=10000)
     full_mm: Optional[int] = Field(default=None, ge=0, le=10000)
-    tz: Optional[str] = Field(default=None, max_length=40)
 
 
 class ProvisionIn(BaseModel):
@@ -221,16 +214,6 @@ class EventOut(BaseModel):
     acked_by_name: Optional[str] = None
     resolved_at: Optional[dt.datetime] = None
     created_at: dt.datetime
-
-
-class ForecastOut(BaseModel):
-    device_id: str
-    fill: Optional[int] = None
-    rate_pct_per_day: Optional[float] = None
-    hours_to_full: Optional[float] = None
-    eta: Optional[dt.datetime] = None
-    points_used: int = 0
-    note: str = ""
 
 
 class StatsOut(BaseModel):

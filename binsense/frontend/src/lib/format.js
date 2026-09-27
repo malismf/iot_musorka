@@ -1,4 +1,16 @@
-// Общие функции отображения: цвета, подписи, даты.
+// Общие функции отображения: цвета, подписи, даты, иконки событий.
+import {
+  CircleCheck,
+  Info,
+  Link as LinkIcon,
+  Power,
+  Ruler,
+  TriangleAlert,
+  Unlink,
+  Wifi,
+  WifiOff,
+  Wrench,
+} from 'lucide-react'
 
 export const COLORS = {
   ok: '#16a34a',
@@ -52,7 +64,6 @@ export function formatDateTime(value) {
 
 export const EVENT_TITLES = {
   full: 'Контейнер заполнен',
-  full_urgent: 'Срочно вывезти',
   collected: 'Контейнер вывезен',
   offline: 'Нет связи',
   online: 'Снова в сети',
@@ -64,14 +75,15 @@ export const EVENT_TITLES = {
 }
 
 export const EVENT_ICONS = {
-  full: '🟠',
-  full_urgent: '🔴',
-  collected: '✅',
-  offline: '📡',
-  online: '📶',
-  sensor_error: '🛠',
-  calibrated: '📏',
-  claimed: '🔗',
-  unclaimed: '🔓',
-  hello: '👋',
+  full: { icon: TriangleAlert, color: '#f97316' },
+  collected: { icon: CircleCheck, color: COLORS.ok },
+  offline: { icon: WifiOff, color: COLORS.offline },
+  online: { icon: Wifi, color: COLORS.ok },
+  sensor_error: { icon: Wrench, color: COLORS.full },
+  calibrated: { icon: Ruler, color: COLORS.unknown },
+  claimed: { icon: LinkIcon, color: COLORS.unknown },
+  unclaimed: { icon: Unlink, color: COLORS.offline },
+  hello: { icon: Power, color: COLORS.offline },
 }
+
+export const DEFAULT_EVENT_ICON = { icon: Info, color: COLORS.unknown }

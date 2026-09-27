@@ -6,7 +6,6 @@
 """
 from __future__ import annotations
 
-import datetime as dt
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
@@ -20,10 +19,6 @@ class EventSpec:
     needs_ack: bool = False
     data: dict[str, Any] = field(default_factory=dict)
     resolves: tuple[str, ...] = ()
-
-
-def _now() -> dt.datetime:
-    return dt.datetime.now(dt.timezone.utc)
 
 
 def device_title(device) -> str:
@@ -49,8 +44,6 @@ def evaluate_telemetry(
 
         if fill >= full_pct and not state.get("full_active"):
             state["full_active"] = True
-            state["full_since"] = _now().isoformat()
-            state["urgent_sent"] = False
             events.append(
                 EventSpec(
                     type="full",
@@ -72,54 +65,13 @@ def evaluate_telemetry(
                     severity="info",
                     message=f"Контейнер вывезен: {title} (было {max_fill}%, стало {fill}%)",
                     data={"fill_before": max_fill, "fill_after": fill},
-                    resolves=("full", "full_urgent"),
+                    resolves=("full",),
                 )
             )
             state["full_active"] = False
-            state["urgent_sent"] = False
             state["max_fill"] = fill
-            state["last_collection"] = _now().isoformat()
 
     return events, state
-
-
-def evaluate_urgent(device, state: dict[str, Any], full_ack_at) -> tuple[list[EventSpec], dict]:
-    """Периодическая проверка: заполнен под завязку и никто не отреагировал."""
-    state = dict(state or {})
-    fill = device["last_fill"]
-    if (
-        not state.get("full_active")
-        or state.get("urgent_sent")
-        or fill is None
-        or fill < settings.urgent_fill
-        or full_ack_at is not None
-    ):
-        return [], state
-
-    since = state.get("full_since")
-    if not since:
-        return [], state
-    try:
-        full_since = dt.datetime.fromisoformat(since)
-    except ValueError:
-        return [], state
-    if _now() - full_since < dt.timedelta(minutes=settings.urgent_delay_min):
-        return [], state
-
-    state["urgent_sent"] = True
-    hours = settings.urgent_delay_min // 60
-    return [
-        EventSpec(
-            type="full_urgent",
-            severity="critical",
-            needs_ack=True,
-            message=(
-                f"Срочно вывезти: {device_title(device)} — {fill}%, "
-                f"событие не подтверждено {hours} ч"
-            ),
-            data={"fill": fill},
-        )
-    ], state
 
 
 def offline_event(device, heartbeat_s: int) -> EventSpec:

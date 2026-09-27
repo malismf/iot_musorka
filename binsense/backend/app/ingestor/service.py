@@ -18,7 +18,6 @@ from ..mqtt import mqtt_admin
 from ..rules import (
     device_event,
     evaluate_telemetry,
-    evaluate_urgent,
     offline_event,
     online_event,
 )
@@ -276,37 +275,6 @@ class Ingestor:
             )
         return len(rows)
 
-    async def check_urgent(self) -> int:
-        rows = await self.pool.fetch(
-            """
-            SELECT d.*, c.version AS config_version, c.config AS config,
-                   c.applied_version AS config_applied_version,
-                   NULL::text AS owner_name, 0::bigint AS open_events,
-                   (SELECT max(acked_at) FROM events e
-                     WHERE e.device_id = d.id AND e.type = 'full'
-                       AND e.created_at > now() - interval '2 days') AS full_ack_at
-              FROM devices d
-              LEFT JOIN device_config c ON c.device_id = d.id
-             WHERE d.status = 'active'
-               AND (d.state ->> 'full_active') = 'true'
-               AND COALESCE((d.state ->> 'urgent_sent')::bool, FALSE) = FALSE
-               AND d.last_fill >= $1
-            """,
-            settings.urgent_fill,
-        )
-        count = 0
-        for row in rows:
-            specs, state = evaluate_urgent(row, dict(row["state"] or {}), row["full_ack_at"])
-            if not specs:
-                continue
-            await self.pool.execute(
-                "UPDATE devices SET state = $2 WHERE id = $1", row["id"], state
-            )
-            for spec in specs:
-                await store_event(self.pool, row, spec)
-            count += 1
-        return count
-
     async def cleanup(self) -> None:
         await self.pool.execute(
             "DELETE FROM telemetry WHERE received_at < now() - make_interval(days => $1)",
@@ -327,7 +295,6 @@ class Ingestor:
         while True:
             try:
                 await self.check_offline()
-                await self.check_urgent()
                 if dt.datetime.now(dt.timezone.utc) - last_cleanup > dt.timedelta(hours=24):
                     await self.cleanup()
                     last_cleanup = dt.datetime.now(dt.timezone.utc)

@@ -11,10 +11,10 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Line } from 'react-chartjs-2'
 import { useNavigate, useParams } from 'react-router-dom'
+import EventIcon from '../components/EventIcon'
 import MapPicker from '../components/MapPicker'
 import { api } from '../lib/api'
 import {
-  EVENT_ICONS,
   fillColor,
   fillLabel,
   formatDateTime,
@@ -97,7 +97,6 @@ export default function DevicePage() {
           </div>
           <div className="spacer" />
           <span className={`badge ${device.online ? 'ok' : ''}`}>{statusLabel(device)}</span>
-          <button onClick={load}>Обновить</button>
           <button onClick={() => navigate('/')}>На карту</button>
         </div>
       </div>
@@ -179,8 +178,9 @@ export default function DevicePage() {
         canEdit={user?.role !== 'driver'}
         center={publicConfig?.map_center}
         onSaved={(updated) => {
+          const sent = updated.config_version !== device.config_version
           setDevice(updated)
-          toast('Настройки сохранены и отправлены устройству')
+          toast(sent ? 'Сохранено, новые настройки отправлены устройству' : 'Сохранено')
           refreshAll().catch(() => {})
         }}
         onUnclaimed={() => {
@@ -194,12 +194,11 @@ export default function DevicePage() {
         {events.length === 0 && <p className="muted small">Событий пока нет</p>}
         {events.map((event) => (
           <div key={event.id} className="event-row">
-            <span className="event-icon">{EVENT_ICONS[event.type] || 'ℹ️'}</span>
+            <EventIcon type={event.type} />
             <div>
               <div>{event.message}</div>
               <div className="small muted">
                 {formatDateTime(event.created_at)}
-                {event.acked_at ? ` · принято ${event.acked_by_name || ''}` : ''}
               </div>
             </div>
           </div>
@@ -231,9 +230,12 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
     interval_s: device.config.interval_s,
     heartbeat_s: device.config.heartbeat_s,
     full_interval_s: device.config.full_interval_s,
-    night_interval_s: device.config.night_interval_s,
-    night_start: device.config.night_start,
-    night_end: device.config.night_end,
+  }))
+  // Калибровка показана в сантиметрах с округлением: отправляем её, только если
+  // поле правили, иначе сохранение формы испортит точное значение в миллиметрах
+  const [savedCalibration, setSavedCalibration] = useState(() => ({
+    empty_cm: form.empty_cm,
+    full_cm: form.full_cm,
   }))
   const [position, setPosition] = useState(
     device.lat !== null && device.lat !== undefined ? [device.lat, device.lon] : null,
@@ -251,22 +253,24 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
       const body = {
         name: form.name,
         address: form.address,
-        empty_mm: form.empty_cm ? Math.round(Number(form.empty_cm) * 10) : null,
-        full_mm: form.full_cm ? Math.round(Number(form.full_cm) * 10) : null,
         full_pct: Number(form.full_pct),
         delta_pct: Number(form.delta_pct),
         interval_s: Number(form.interval_s),
         heartbeat_s: Number(form.heartbeat_s),
         full_interval_s: Number(form.full_interval_s),
-        night_interval_s: Number(form.night_interval_s),
-        night_start: Number(form.night_start),
-        night_end: Number(form.night_end),
+      }
+      for (const key of ['empty', 'full']) {
+        const cm = form[`${key}_cm`]
+        if (cm && String(cm) !== String(savedCalibration[`${key}_cm`])) {
+          body[`${key}_mm`] = Math.round(Number(cm) * 10)
+        }
       }
       if (position) {
         body.lat = position[0]
         body.lon = position[1]
       }
       const updated = await api(`/devices/${device.id}`, { method: 'PATCH', body })
+      setSavedCalibration({ empty_cm: form.empty_cm, full_cm: form.full_cm })
       onSaved(updated)
     } catch (err) {
       setError(err.message)
@@ -338,25 +342,6 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
               />
             </label>
           </div>
-          <div className="row">
-            <label className="field" style={{ flex: 1 }}>
-              <span>Ночью, с</span>
-              <input
-                type="number"
-                value={form.night_interval_s}
-                onChange={change('night_interval_s')}
-                disabled={!canEdit}
-              />
-            </label>
-            <label className="field" style={{ flex: 1 }}>
-              <span>Ночь с, ч</span>
-              <input type="number" value={form.night_start} onChange={change('night_start')} disabled={!canEdit} />
-            </label>
-            <label className="field" style={{ flex: 1 }}>
-              <span>Ночь до, ч</span>
-              <input type="number" value={form.night_end} onChange={change('night_end')} disabled={!canEdit} />
-            </label>
-          </div>
         </div>
         <div>
           <span className="small muted">Место установки</span>
@@ -366,7 +351,7 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
       {error && <div className="error">{error}</div>}
       <div className="row" style={{ marginTop: 10 }}>
         <button className="primary" type="submit" disabled={busy || !canEdit}>
-          {busy ? 'Сохраняю…' : 'Сохранить и отправить устройству'}
+          {busy ? 'Сохраняю…' : 'Сохранить'}
         </button>
         <div className="spacer" />
         {canEdit && (
@@ -375,10 +360,6 @@ function SettingsCard({ device, center, canEdit, onSaved, onUnclaimed }) {
           </button>
         )}
       </div>
-      <p className="small muted" style={{ marginTop: 6 }}>
-        Настройки публикуются в MQTT как retained-сообщение: устройство применит их, как только
-        получит (или после переподключения), и подтвердит номером версии.
-      </p>
     </form>
   )
 }

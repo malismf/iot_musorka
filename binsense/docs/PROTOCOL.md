@@ -62,8 +62,7 @@ MAC-адреса. Он же служит логином MQTT и client id.
 {
   "ver": 3, "claimed": true,
   "interval_s": 900, "heartbeat_s": 7200,
-  "full_interval_s": 300, "night_interval_s": 1800,
-  "night": [23, 7], "tz": "MSK-3",
+  "full_interval_s": 300,
   "full_pct": 80, "delta_pct": 3, "samples": 7,
   "empty_mm": 982, "full_mm": 250
 }
@@ -143,7 +142,6 @@ ingestor после записи телеметрии выполняет `pg_not
 | `DELETE /devices/{id}/claim` | отвязка |
 | `GET /devices/{id}/telemetry` | история, `bucket=raw\|5m\|1h\|1d` |
 | `GET /devices/{id}/events` | события устройства |
-| `GET /devices/{id}/forecast` | прогноз заполнения |
 | `GET /events`, `POST /events/{id}/ack` | лента событий и подтверждение |
 | `GET /stats/overview` | сводка для панели |
 | `GET /route` | маршрут по заполненным контейнерам |

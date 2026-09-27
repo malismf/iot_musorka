@@ -77,11 +77,6 @@ export default function ListPage() {
                 <td>{timeAgo(device.last_seen)}</td>
                 <td>
                   <span className={`badge ${badgeClass(device)}`}>{statusLabel(device)}</span>
-                  {device.open_events > 0 && (
-                    <span className="badge danger" style={{ marginLeft: 6 }}>
-                      {device.open_events}
-                    </span>
-                  )}
                 </td>
               </tr>
             ))}

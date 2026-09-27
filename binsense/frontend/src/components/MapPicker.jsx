@@ -1,11 +1,16 @@
 import L from 'leaflet'
+import { LocateFixed, MapPin } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
-import { TILE_ATTRIBUTION, TILE_URL } from '../lib/tiles'
+import { DEFAULT_MAP_CENTER, TILE_ATTRIBUTION, TILE_URL } from '../lib/tiles'
 
+// Leaflet принимает разметку метки строкой, поэтому иконку рендерим в HTML
 const pinIcon = L.divIcon({
   className: '',
-  html: '<div class="bin-marker" style="background:#16a34a">📍</div>',
+  html: `<div class="bin-marker" style="background:#16a34a">${renderToStaticMarkup(
+    <MapPin size={18} strokeWidth={2.5} />,
+  )}</div>`,
   iconSize: [38, 38],
   iconAnchor: [19, 19],
 })
@@ -31,7 +36,7 @@ function Recenter({ position }) {
 export default function MapPicker({ value, onChange, center, zoom = 15, height = 280 }) {
   const [locating, setLocating] = useState(false)
   const [error, setError] = useState('')
-  const start = value || center || [55.7558, 37.6173]
+  const start = value || center || DEFAULT_MAP_CENTER
 
   const locate = () => {
     if (!navigator.geolocation) {
@@ -63,8 +68,9 @@ export default function MapPicker({ value, onChange, center, zoom = 15, height =
   return (
     <div>
       <div className="row" style={{ marginBottom: 8 }}>
-        <button type="button" onClick={locate} disabled={locating}>
-          {locating ? 'Определяю…' : '📍 Моё местоположение'}
+        <button type="button" className="with-icon" onClick={locate} disabled={locating}>
+          <LocateFixed size={16} aria-hidden="true" />
+          {locating ? 'Определяю…' : 'Моё местоположение'}
         </button>
         <span className="small muted">
           {value ? `${value[0].toFixed(5)}, ${value[1].toFixed(5)}` : 'кликните по карте'}

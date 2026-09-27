@@ -40,8 +40,6 @@ export default function AdminPage() {
 
 function DevicesTab({ toast }) {
   const [devices, setDevices] = useState([])
-  const [newId, setNewId] = useState('')
-  const [result, setResult] = useState(null)
   const [error, setError] = useState('')
 
   const load = useCallback(async () => {
@@ -52,24 +50,6 @@ function DevicesTab({ toast }) {
     load().catch((err) => setError(err.message))
   }, [load])
 
-  const provision = async (event) => {
-    event.preventDefault()
-    setError('')
-    setResult(null)
-    try {
-      const data = await api('/admin/devices', {
-        method: 'POST',
-        body: { device_id: newId.trim().toLowerCase(), hw: 'manual', reset_claim_code: true },
-      })
-      setResult(data)
-      setNewId('')
-      await load()
-      toast('Устройство подготовлено')
-    } catch (err) {
-      setError(err.message)
-    }
-  }
-
   const remove = async (id) => {
     if (!window.confirm(`Удалить ${id} вместе с историей?`)) return
     await api(`/admin/devices/${id}`, { method: 'DELETE' })
@@ -78,78 +58,48 @@ function DevicesTab({ toast }) {
   }
 
   return (
-    <>
-      <form className="card" onSubmit={provision}>
-        <h2>Подготовить устройство</h2>
-        <p className="muted small">
-          Обычно это делает скрипт <code>tools/provision.py</code> при подключённой плате. Здесь
-          можно выдать учётные данные вручную — например, для эмулятора.
-        </p>
-        <div className="row">
-          <input
-            placeholder="bin-a1b2c3"
-            value={newId}
-            onChange={(e) => setNewId(e.target.value)}
-            style={{ maxWidth: 240 }}
-            required
-          />
-          <button className="primary" type="submit">
-            Выдать учётные данные
-          </button>
-        </div>
-        {error && <div className="error">{error}</div>}
-        {result && (
-          <pre
-            className="small"
-            style={{ background: '#f8fafc', padding: 10, borderRadius: 10, overflowX: 'auto' }}
-          >
-            {JSON.stringify(result, null, 2)}
-          </pre>
-        )}
-      </form>
-
-      <div className="card">
-        <h2>Все устройства</h2>
-        <div style={{ overflowX: 'auto' }}>
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Название</th>
-                <th>Статус</th>
-                <th>Владелец</th>
-                <th>Прошивка</th>
-                <th>Данные</th>
-                <th />
+    <div className="card">
+      <h2>Все устройства</h2>
+      {error && <div className="error">{error}</div>}
+      <div style={{ overflowX: 'auto' }}>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Название</th>
+              <th>Статус</th>
+              <th>Владелец</th>
+              <th>Прошивка</th>
+              <th>Данные</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {devices.map((device) => (
+              <tr key={device.id}>
+                <td>
+                  <Link to={`/devices/${device.id}`}>{device.id}</Link>
+                </td>
+                <td>{device.name || '—'}</td>
+                <td>
+                  <span className={`badge ${device.status === 'active' ? 'ok' : ''}`}>
+                    {device.status === 'active' ? 'привязано' : 'не привязано'}
+                  </span>
+                </td>
+                <td>{device.owner_name || '—'}</td>
+                <td>{device.fw || '—'}</td>
+                <td>{timeAgo(device.last_seen)}</td>
+                <td>
+                  <button className="small danger" onClick={() => remove(device.id)}>
+                    Удалить
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {devices.map((device) => (
-                <tr key={device.id}>
-                  <td>
-                    <Link to={`/devices/${device.id}`}>{device.id}</Link>
-                  </td>
-                  <td>{device.name || '—'}</td>
-                  <td>
-                    <span className={`badge ${device.status === 'active' ? 'ok' : ''}`}>
-                      {device.status === 'active' ? 'привязано' : 'не привязано'}
-                    </span>
-                  </td>
-                  <td>{device.owner_name || '—'}</td>
-                  <td>{device.fw || '—'}</td>
-                  <td>{timeAgo(device.last_seen)}</td>
-                  <td>
-                    <button className="small danger" onClick={() => remove(device.id)}>
-                      Удалить
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
-    </>
+    </div>
   )
 }
 
