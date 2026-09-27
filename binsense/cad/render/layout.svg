@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="608" height="618" viewBox="0 0 608 618" font-family="DejaVu Sans, Verdana, sans-serif">
+<rect width="608" height="618" fill="#ffffff"/>
+<text x="90" y="42" font-size="22" fill="#1d2329">BinSense — схема расположения элементов, вид сверху (крышка снята)</text>
+<rect x="90.0" y="130.0" width="428.8" height="288.0" rx="14" fill="#eef1f3" stroke="#41505c" stroke-width="1.2"/>
+<rect x="123.6" y="163.6" width="361.6" height="220.8" rx="8" fill="#e2e7ea" stroke="#41505c" stroke-width="1.2"/>
+<rect x="131.6" y="171.6" width="345.6" height="204.8" rx="4" fill="#ffffff" stroke="#41505c" stroke-width="1.2"/>
+<circle cx="496.4" cy="152.4" r="6.4" fill="#ffffff" stroke="#7a838c" stroke-width="1.2"/>
+<circle cx="112.4" cy="152.4" r="6.4" fill="#ffffff" stroke="#7a838c" stroke-width="1.2"/>
+<circle cx="496.4" cy="395.6" r="6.4" fill="#ffffff" stroke="#7a838c" stroke-width="1.2"/>
+<circle cx="112.4" cy="395.6" r="6.4" fill="#ffffff" stroke="#7a838c" stroke-width="1.2"/>
+<circle cx="304.4" cy="146.0" r="6.4" fill="#ffffff" stroke="#7a838c" stroke-width="1.2"/>
+<circle cx="304.4" cy="402.0" r="6.4" fill="#ffffff" stroke="#7a838c" stroke-width="1.2"/>
+<rect x="171.6" y="180.4" width="252.8" height="68.8" rx="2" fill="#dbe4ea" stroke="#41505c" stroke-width="1.2"/>
+<text x="298.0" y="218.8" font-size="13" text-anchor="middle" fill="#1d2329">держатель 18650 (79 × 21.5 × 20)</text>
+<rect x="159.6" y="284.4" width="161.6" height="81.6" rx="2" fill="#d6e8dc" stroke="#41505c" stroke-width="1.2"/>
+<text x="240.4" y="316.4" font-size="13" text-anchor="middle" fill="#1d2329">плата ESP32 LOLIN D32</text>
+<text x="240.4" y="342.0" font-size="11" text-anchor="middle" fill="#5c666f">50.5 × 25.5, М2 по углам</text>
+<circle cx="167.6" cy="358.0" r="9.6" fill="none" stroke="#7a838c" stroke-width="1.2"/>
+<circle cx="167.6" cy="292.4" r="9.6" fill="none" stroke="#7a838c" stroke-width="1.2"/>
+<circle cx="313.2" cy="358.0" r="9.6" fill="none" stroke="#7a838c" stroke-width="1.2"/>
+<circle cx="313.2" cy="292.4" r="9.6" fill="none" stroke="#7a838c" stroke-width="1.2"/>
+<circle cx="387.6" cy="318.8" r="60.8" fill="none" stroke="#9aa4ad" stroke-width="1.2"/>
+<circle cx="387.6" cy="318.8" r="48.0" fill="#e8f0e9" stroke="#41505c" stroke-width="1.2"/>
+<circle cx="387.6" cy="318.8" r="36.8" fill="#cfe0d3" stroke="#41505c" stroke-width="1.2"/>
+<text x="387.6" y="361.2" font-size="12" text-anchor="middle" fill="#1d2329">вставка датчика</text>
+<text x="387.6" y="386.8" font-size="11" text-anchor="middle" fill="#5c666f">отв. 30, головка 23</text>
+<rect x="432.4" y="179.6" width="38.4" height="70.4" rx="2" fill="#f3ecda" stroke="#41505c" stroke-width="1.2"/>
+<text x="451.6" y="218.8" font-size="11" text-anchor="middle" fill="#1d2329">силикагель</text>
+<circle cx="123.6" cy="299.6" r="20.8" fill="#fdf0cf" stroke="#41505c" stroke-width="1.2"/>
+<text x="72.4" y="303.6" font-size="12" text-anchor="end" fill="#1d2329">кнопка</text>
+<circle cx="123.6" cy="344.4" r="14.4" fill="#e5f2fb" stroke="#41505c" stroke-width="1.2"/>
+<text x="72.4" y="348.4" font-size="12" text-anchor="end" fill="#1d2329">световод</text>
+<rect x="169.2" y="281.2" width="142.4" height="88.0" rx="2" fill="none" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="6 4"/>
+<text x="240.4" y="380.4" font-size="11" text-anchor="middle" fill="#c0392b">габарит колодок Dupont</text>
+<line x1="89.99999999999997" y1="106.0" x2="518.8" y2="106.0" stroke="#c0392b" stroke-width="1"/>
+<line x1="89.99999999999997" y1="102.0" x2="89.99999999999997" y2="110.0" stroke="#c0392b" stroke-width="1"/>
+<line x1="518.8" y1="102.0" x2="518.8" y2="110.0" stroke="#c0392b" stroke-width="1"/>
+<text x="304.4" y="100.0" font-size="13" fill="#c0392b" text-anchor="middle">134</text>
+<line x1="540.8" y1="130.0" x2="540.8" y2="418.0" stroke="#c0392b" stroke-width="1"/>
+<line x1="536.8" y1="130.0" x2="544.8" y2="130.0" stroke="#c0392b" stroke-width="1"/>
+<line x1="536.8" y1="418.0" x2="544.8" y2="418.0" stroke="#c0392b" stroke-width="1"/>
+<text x="546.8" y="274.0" font-size="13" fill="#c0392b">90</text>
+<line x1="131.59999999999997" y1="161.6" x2="477.2" y2="161.6" stroke="#c0392b" stroke-width="1"/>
+<line x1="131.59999999999997" y1="157.6" x2="131.59999999999997" y2="165.6" stroke="#c0392b" stroke-width="1"/>
+<line x1="477.2" y1="157.6" x2="477.2" y2="165.6" stroke="#c0392b" stroke-width="1"/>
+<text x="304.4" y="155.6" font-size="13" fill="#c0392b" text-anchor="middle">внутри 108</text>
+<text x="90" y="522" font-size="13" fill="#41505c">Стенка 2.5 · пол 2.5 · крышка 3.0 · внутренняя высота 30.0</text>
+<text x="90" y="540" font-size="13" fill="#41505c">Уплотнитель: шнур 2.4×2.4 в пазу крышки 2.6×1.8</text>
+<text x="90" y="558" font-size="13" fill="#41505c">Винты корпуса: 6 × М3 по фланцу, снаружи уплотнительного контура</text>
+<text x="90" y="576" font-size="13" fill="#41505c">Датчик смотрит вниз, кнопка и световод — в торцевой стенке −X</text>
+<text x="90" y="594" font-size="13" fill="#41505c">Все размеры в миллиметрах. Источник: cad/model/params.py</text>
+</svg>

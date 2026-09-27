@@ -1,0 +1,11 @@
+# Серверная часть BinSense (Python 3.12)
+fastapi==0.141.1
+uvicorn[standard]==0.53.0
+python-multipart==0.0.32
+asyncpg==0.31.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+PyJWT==2.14.0
+aiomqtt==2.5.1
+httpx==0.28.1
+aiogram==3.31.0

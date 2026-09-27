@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1000" viewBox="0 0 1500 1000" font-family="DejaVu Sans, Verdana, sans-serif">
+<rect width="1500" height="1000" fill="#ffffff"/>
+<text x="60.0" y="70.0" font-size="22" fill="#14181c" font-weight="bold">Монтажная схема: макетная плата 40 × 60 мм рядом с NodeMCU</text>
+<text x="60.0" y="96.0" font-size="12" fill="#6b737b">Вид сверху. NodeMCU вставляется в гребёнки, обвязка — на той же макетной плате. Размеры в клетках 2.54 мм.</text>
+<rect x="120.0" y="150.0" width="620.0" height="300.0" rx="6" fill="#eef3ef" stroke="#4a7a5c" stroke-width="2"/>
+<text x="132.0" y="176.0" font-size="13" fill="#2f6b4c" font-weight="bold">U1 NodeMCU (ESP8266), разъём USB — питание</text>
+<rect x="130.0" y="201.0" width="18.0" height="18.0" rx="3" fill="#c8d8cd" stroke="#4a7a5c" stroke-width="1.2"/>
+<text x="156.0" y="215.0" font-size="11" fill="#14181c">3V3</text>
+<rect x="130.0" y="231.0" width="18.0" height="18.0" rx="3" fill="#c8d8cd" stroke="#4a7a5c" stroke-width="1.2"/>
+<text x="156.0" y="245.0" font-size="11" fill="#14181c">GND</text>
+<rect x="130.0" y="261.0" width="18.0" height="18.0" rx="3" fill="#c8d8cd" stroke="#4a7a5c" stroke-width="1.2"/>
+<text x="156.0" y="275.0" font-size="11" fill="#14181c">VIN</text>
+<rect x="130.0" y="291.0" width="18.0" height="18.0" rx="3" fill="#c8d8cd" stroke="#4a7a5c" stroke-width="1.2"/>
+<text x="156.0" y="305.0" font-size="11" fill="#14181c">D3</text>
+<rect x="712.0" y="201.0" width="18.0" height="18.0" rx="3" fill="#c8d8cd" stroke="#4a7a5c" stroke-width="1.2"/>
+<text x="704.0" y="215.0" font-size="11" fill="#14181c" text-anchor="end">D1</text>
+<rect x="712.0" y="231.0" width="18.0" height="18.0" rx="3" fill="#c8d8cd" stroke="#4a7a5c" stroke-width="1.2"/>
+<text x="704.0" y="245.0" font-size="11" fill="#14181c" text-anchor="end">D2</text>
+<rect x="712.0" y="261.0" width="18.0" height="18.0" rx="3" fill="#c8d8cd" stroke="#4a7a5c" stroke-width="1.2"/>
+<text x="704.0" y="275.0" font-size="11" fill="#14181c" text-anchor="end">D5</text>
+<rect x="712.0" y="291.0" width="18.0" height="18.0" rx="3" fill="#c8d8cd" stroke="#4a7a5c" stroke-width="1.2"/>
+<text x="704.0" y="305.0" font-size="11" fill="#14181c" text-anchor="end">D6</text>
+<rect x="712.0" y="321.0" width="18.0" height="18.0" rx="3" fill="#c8d8cd" stroke="#4a7a5c" stroke-width="1.2"/>
+<text x="704.0" y="335.0" font-size="11" fill="#14181c" text-anchor="end">D7</text>
+<rect x="712.0" y="351.0" width="18.0" height="18.0" rx="3" fill="#c8d8cd" stroke="#4a7a5c" stroke-width="1.2"/>
+<text x="704.0" y="365.0" font-size="11" fill="#14181c" text-anchor="end">D8</text>
+<rect x="820.0" y="150.0" width="560.0" height="330.0" rx="6" fill="#fdf7ea" stroke="#b08a3e" stroke-width="2"/>
+<text x="832.0" y="176.0" font-size="13" fill="#8a6a26" font-weight="bold">Макетная плата 40 × 60 мм</text>
+<rect x="850.0" y="200.0" width="120.0" height="46.0" rx="4" fill="#ffffff" stroke="#b08a3e" stroke-width="1.4"/>
+<text x="910.0" y="220.0" font-size="12" fill="#14181c" text-anchor="middle" font-weight="bold">D1 RGB</text>
+<text x="910.0" y="236.0" font-size="9" fill="#6b737b" text-anchor="middle">к стенке корпуса</text>
+<rect x="990.0" y="200.0" width="120.0" height="46.0" rx="4" fill="#ffffff" stroke="#b08a3e" stroke-width="1.4"/>
+<text x="1050.0" y="220.0" font-size="12" fill="#14181c" text-anchor="middle" font-weight="bold">R2 R3 R4</text>
+<text x="1050.0" y="236.0" font-size="9" fill="#6b737b" text-anchor="middle">по 220 Ом</text>
+<rect x="1130.0" y="200.0" width="120.0" height="46.0" rx="4" fill="#ffffff" stroke="#b08a3e" stroke-width="1.4"/>
+<text x="1190.0" y="220.0" font-size="12" fill="#14181c" text-anchor="middle" font-weight="bold">клеммы</text>
+<text x="1190.0" y="236.0" font-size="9" fill="#6b737b" text-anchor="middle">провода датчика</text>
+<rect x="850.0" y="270.0" width="120.0" height="46.0" rx="4" fill="#ffffff" stroke="#b08a3e" stroke-width="1.4"/>
+<text x="910.0" y="290.0" font-size="12" fill="#14181c" text-anchor="middle" font-weight="bold">Q1 S8050</text>
+<text x="910.0" y="306.0" font-size="9" fill="#6b737b" text-anchor="middle">ключ зуммера</text>
+<rect x="990.0" y="270.0" width="120.0" height="46.0" rx="4" fill="#ffffff" stroke="#b08a3e" stroke-width="1.4"/>
+<text x="1050.0" y="290.0" font-size="12" fill="#14181c" text-anchor="middle" font-weight="bold">R5 1 кОм</text>
+<text x="1050.0" y="306.0" font-size="9" fill="#6b737b" text-anchor="middle">база Q1</text>
+<rect x="1130.0" y="270.0" width="120.0" height="46.0" rx="4" fill="#ffffff" stroke="#b08a3e" stroke-width="1.4"/>
+<text x="1190.0" y="290.0" font-size="12" fill="#14181c" text-anchor="middle" font-weight="bold">SW1 кнопка</text>
+<text x="1190.0" y="306.0" font-size="9" fill="#6b737b" text-anchor="middle">только для D1 mini</text>
+<rect x="850.0" y="340.0" width="260.0" height="46.0" rx="4" fill="#ffffff" stroke="#b08a3e" stroke-width="1.4"/>
+<text x="980.0" y="360.0" font-size="12" fill="#14181c" text-anchor="middle" font-weight="bold">BZ1 зуммер</text>
+<text x="980.0" y="376.0" font-size="9" fill="#6b737b" text-anchor="middle">опционально, выносится проводами</text>
+<rect x="1130.0" y="340.0" width="120.0" height="46.0" rx="4" fill="#ffffff" stroke="#b08a3e" stroke-width="1.4"/>
+<text x="1190.0" y="360.0" font-size="12" fill="#14181c" text-anchor="middle" font-weight="bold">R6 R7</text>
+<text x="1190.0" y="376.0" font-size="9" fill="#6b737b" text-anchor="middle">делитель, HC-SR04</text>
+<text x="120.0" y="620.0" font-size="15" fill="#14181c" font-weight="bold">Провода между платой и обвязкой</text>
+<path d="M 120.0 650.0 L 200.0 650.0" fill="none" stroke="#d8d8d8" stroke-width="5" stroke-linecap="round"/>
+<text x="216.0" y="655.0" font-size="12" fill="#14181c">U1.D5 → U2.TX</text>
+<text x="470.0" y="655.0" font-size="11" fill="#6b737b">бел.</text>
+<path d="M 120.0 676.0 L 200.0 676.0" fill="none" stroke="#f2c94c" stroke-width="5" stroke-linecap="round"/>
+<text x="216.0" y="681.0" font-size="12" fill="#14181c">U1.D6 → U2.RX</text>
+<text x="470.0" y="681.0" font-size="11" fill="#6b737b">жёлт.</text>
+<path d="M 120.0 702.0 L 200.0 702.0" fill="none" stroke="#27ae60" stroke-width="5" stroke-linecap="round"/>
+<text x="216.0" y="707.0" font-size="12" fill="#14181c">U1.D3 → SW1</text>
+<text x="470.0" y="707.0" font-size="11" fill="#6b737b">BTN, только D1 mini</text>
+<path d="M 120.0 728.0 L 200.0 728.0" fill="none" stroke="#eb5757" stroke-width="5" stroke-linecap="round"/>
+<text x="216.0" y="733.0" font-size="12" fill="#14181c">U1.D1 → R2</text>
+<text x="470.0" y="733.0" font-size="11" fill="#6b737b">LED_R</text>
+<path d="M 120.0 754.0 L 200.0 754.0" fill="none" stroke="#27ae60" stroke-width="5" stroke-linecap="round"/>
+<text x="216.0" y="759.0" font-size="12" fill="#14181c">U1.D2 → R3</text>
+<text x="470.0" y="759.0" font-size="11" fill="#6b737b">LED_G</text>
+<path d="M 120.0 780.0 L 200.0 780.0" fill="none" stroke="#2d9cdb" stroke-width="5" stroke-linecap="round"/>
+<text x="216.0" y="785.0" font-size="12" fill="#14181c">U1.D7 → R4</text>
+<text x="470.0" y="785.0" font-size="11" fill="#6b737b">LED_B</text>
+<path d="M 120.0 806.0 L 200.0 806.0" fill="none" stroke="#f2994a" stroke-width="5" stroke-linecap="round"/>
+<text x="216.0" y="811.0" font-size="12" fill="#14181c">U1.D8 → R5</text>
+<text x="470.0" y="811.0" font-size="11" fill="#6b737b">BUZZ</text>
+<path d="M 120.0 832.0 L 200.0 832.0" fill="none" stroke="#eb5757" stroke-width="5" stroke-linecap="round"/>
+<text x="216.0" y="837.0" font-size="12" fill="#14181c">U1.3V3 → шина +3.3 В</text>
+<text x="470.0" y="837.0" font-size="11" fill="#6b737b">питание</text>
+<path d="M 120.0 858.0 L 200.0 858.0" fill="none" stroke="#333333" stroke-width="5" stroke-linecap="round"/>
+<text x="216.0" y="863.0" font-size="12" fill="#14181c">U1.GND → шина GND</text>
+<text x="470.0" y="863.0" font-size="11" fill="#6b737b">земля</text>
+<text x="820.0" y="620.0" font-size="15" fill="#14181c" font-weight="bold">Правила пайки</text>
+<text x="820.0" y="650.0" font-size="12" fill="#6b737b">D3, D4 и D8 — выводы загрузчика: при включении D3 и D4</text>
+<text x="820.0" y="674.0" font-size="12" fill="#6b737b">не должны быть притянуты к земле, а D8 — к питанию.</text>
+<text x="820.0" y="698.0" font-size="12" fill="#6b737b">Поэтому кнопку не держат при включении, а зуммер</text>
+<text x="820.0" y="722.0" font-size="12" fill="#6b737b">стоит на D8 через ключ.</text>
+<text x="820.0" y="746.0" font-size="12" fill="#6b737b">Провода датчика обжимаются в клеммник: разъём Dupont в</text>
+<text x="820.0" y="770.0" font-size="12" fill="#6b737b">контейнере разбалтывается от вибрации при выгрузке.</text>
+<text x="820.0" y="794.0" font-size="12" fill="#6b737b">Питание — зарядка телефона 5 В, 1 А и кабель micro-USB.</text>
+<rect x="20.0" y="20.0" width="1460.0" height="960.0" rx="0" fill="none" stroke="#14181c" stroke-width="2.2"/>
+<rect x="1020.0" y="868.0" width="460.0" height="112.0" rx="0" fill="#ffffff" stroke="#14181c" stroke-width="2.0"/>
+<path d="M 1020.0 906.0 L 1480.0 906.0" fill="none" stroke="#14181c" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M 1020.0 942.0 L 1480.0 942.0" fill="none" stroke="#14181c" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M 1320.0 868.0 L 1320.0 980.0" fill="none" stroke="#14181c" stroke-width="1.2" stroke-linecap="round"/>
+<text x="1032.0" y="894.0" font-size="15" fill="#14181c" font-weight="bold">Монтажная схема</text>
+<text x="1032.0" y="930.0" font-size="12" fill="#6b737b">BinSense — мониторинг заполненности контейнеров</text>
+<text x="1032.0" y="966.0" font-size="11" fill="#6b737b">Источник: hardware/WIRING.md, hardware/BOM.csv</text>
+<text x="1332.0" y="894.0" font-size="13" fill="#14181c" font-weight="bold">Сборка на макетной плате</text>
+<text x="1332.0" y="930.0" font-size="12" fill="#6b737b">Учебный проект</text>
+<text x="1332.0" y="966.0" font-size="11" fill="#6b737b">Схему генерирует make_schematic.py</text>
+</svg>

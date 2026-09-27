@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" font-family="DejaVu Sans, Verdana, sans-serif">
+<rect width="1200" height="820" fill="#ffffff"/>
+<rect x="420.0" y="200.0" width="300.0" height="260.0" rx="4" fill="#f4f7f9" stroke="#14181c" stroke-width="2.2"/>
+<text x="570.0" y="226.0" font-size="16" fill="#14181c" text-anchor="middle" font-weight="bold">U1  NodeMCU (ESP8266)</text>
+<text x="570.0" y="244.0" font-size="11" fill="#6b737b" text-anchor="middle">окружение esp8266_hcsr04</text>
+<path d="M 720.0 250.0 L 754.0 250.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="712.0" y="254.0" font-size="12" fill="#14181c" text-anchor="end">D5 / GPIO14</text>
+<path d="M 754.0 239.0 L 785.4 239.0 L 795.4 250.0 L 785.4 261.0 L 754.0 261.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="762.0" y="254.0" font-size="12" fill="#0a6b4a" font-weight="bold">TRIG</text>
+<path d="M 720.0 330.0 L 754.0 330.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="712.0" y="334.0" font-size="12" fill="#14181c" text-anchor="end">D6 / GPIO12</text>
+<path d="M 754.0 319.0 L 815.8 319.0 L 825.8 330.0 L 815.8 341.0 L 754.0 341.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="762.0" y="334.0" font-size="12" fill="#0a6b4a" font-weight="bold">ECHO_DIV</text>
+<path d="M 720.0 410.0 L 754.0 410.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="712.0" y="414.0" font-size="12" fill="#14181c" text-anchor="end">VIN</text>
+<path d="M 754.0 399.0 L 777.8 399.0 L 787.8 410.0 L 777.8 421.0 L 754.0 421.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="762.0" y="414.0" font-size="12" fill="#0a6b4a" font-weight="bold">+5V</text>
+<path d="M 386.0 410.0 L 420.0 410.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="428.0" y="414.0" font-size="12" fill="#14181c">GND</text>
+<path d="M 356.0 410.0 L 356.0 426.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 340.0 426.0 L 372.0 426.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 346.0 432.0 L 366.0 432.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 351.0 438.0 L 361.0 438.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 356.0 410.0 L 386.0 410.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<rect x="900.0" y="200.0" width="190.0" height="170.0" rx="4" fill="#f4f7f9" stroke="#14181c" stroke-width="2.2"/>
+<text x="995.0" y="226.0" font-size="16" fill="#14181c" text-anchor="middle" font-weight="bold">U3  HC-SR04</text>
+<text x="995.0" y="244.0" font-size="11" fill="#6b737b" text-anchor="middle">питание 5 В</text>
+<path d="M 866.0 230.0 L 900.0 230.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="908.0" y="234.0" font-size="12" fill="#14181c">VCC</text>
+<path d="M 866.0 270.0 L 900.0 270.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="908.0" y="274.0" font-size="12" fill="#14181c">Trig</text>
+<path d="M 866.0 310.0 L 900.0 310.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="908.0" y="314.0" font-size="12" fill="#14181c">Echo</text>
+<path d="M 866.0 350.0 L 900.0 350.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="908.0" y="354.0" font-size="12" fill="#14181c">GND</text>
+<path d="M 866.0 219.0 L 842.2 219.0 L 832.2 230.0 L 842.2 241.0 L 866.0 241.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="858.0" y="234.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">+5V</text>
+<path d="M 866.0 259.0 L 834.6 259.0 L 824.6 270.0 L 834.6 281.0 L 866.0 281.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="858.0" y="274.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">TRIG</text>
+<path d="M 866.0 350.0 L 866.0 366.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 850.0 366.0 L 882.0 366.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 856.0 372.0 L 876.0 372.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 861.0 378.0 L 871.0 378.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 866.0 310.0 L 700.0 310.0 L 700.0 560.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 700.0 560.0 L 700.0 571.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<rect x="694.0" y="571.0" width="12.0" height="34.0" rx="0" fill="#ffffff" stroke="#14181c" stroke-width="1.6"/>
+<path d="M 700.0 605.0 L 700.0 616.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="712.0" y="583.0" font-size="13" fill="#0b5ea8" font-weight="bold">R6</text>
+<text x="712.0" y="598.0" font-size="12" fill="#7a4600">1 кОм</text>
+<circle cx="700.0" cy="616.0" r="4.0" fill="#14181c"/>
+<path d="M 560.0 605.0 L 498.2 605.0 L 488.2 616.0 L 498.2 627.0 L 560.0 627.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="552.0" y="620.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">ECHO_DIV</text>
+<path d="M 560.0 616.0 L 700.0 616.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 700.0 616.0 L 700.0 627.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<rect x="694.0" y="627.0" width="12.0" height="34.0" rx="0" fill="#ffffff" stroke="#14181c" stroke-width="1.6"/>
+<path d="M 700.0 661.0 L 700.0 672.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="688.0" y="639.0" font-size="13" fill="#0b5ea8" text-anchor="end" font-weight="bold">R7</text>
+<text x="688.0" y="654.0" font-size="12" fill="#7a4600" text-anchor="end">2 кОм</text>
+<path d="M 700.0 672.0 L 700.0 688.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 684.0 688.0 L 716.0 688.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 690.0 694.0 L 710.0 694.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 695.0 700.0 L 705.0 700.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<text x="120.0" y="620.0" font-size="12" fill="#14181c">Делитель 1 кОм / 2 кОм: 5 В на выходе Echo</text>
+<text x="120.0" y="640.0" font-size="12" fill="#14181c">превращаются в 3.3 В на входе ESP8266.</text>
+<text x="120.0" y="680.0" font-size="12" fill="#6b737b">Trig от 3.3 В HC-SR04 понимает без согласования.</text>
+<text x="120.0" y="700.0" font-size="12" fill="#6b737b">HC-SR04 не защищён от влаги: для установки на</text>
+<text x="120.0" y="720.0" font-size="12" fill="#6b737b">контейнер лучше A02YYUW (лист 1).</text>
+<rect x="20.0" y="20.0" width="1160.0" height="780.0" rx="0" fill="none" stroke="#14181c" stroke-width="2.2"/>
+<rect x="720.0" y="688.0" width="460.0" height="112.0" rx="0" fill="#ffffff" stroke="#14181c" stroke-width="2.0"/>
+<path d="M 720.0 726.0 L 1180.0 726.0" fill="none" stroke="#14181c" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M 720.0 762.0 L 1180.0 762.0" fill="none" stroke="#14181c" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M 1020.0 688.0 L 1020.0 800.0" fill="none" stroke="#14181c" stroke-width="1.2" stroke-linecap="round"/>
+<text x="732.0" y="714.0" font-size="15" fill="#14181c" font-weight="bold">Схема с датчиком HC-SR04</text>
+<text x="732.0" y="750.0" font-size="12" fill="#6b737b">BinSense — мониторинг заполненности контейнеров</text>
+<text x="732.0" y="786.0" font-size="11" fill="#6b737b">Собирается окружением pio run -e esp8266_hcsr04</text>
+<text x="1032.0" y="714.0" font-size="13" fill="#14181c" font-weight="bold">Лист 2 из 2 · вариант датчика</text>
+<text x="1032.0" y="750.0" font-size="12" fill="#6b737b">Учебный проект</text>
+<text x="1032.0" y="786.0" font-size="11" fill="#6b737b">Схему генерирует make_schematic.py</text>
+</svg>

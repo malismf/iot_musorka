@@ -1,0 +1,8 @@
+# Скрипты и конфиги монтируются в Linux-контейнеры (mosquitto, postgres, caddy):
+# с окончаниями строк CRLF из Windows они падают с «/bin/sh^M: not found».
+# Поэтому все текстовые файлы в рабочей копии — с LF, в том числе на Windows.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.pdf binary

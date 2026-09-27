@@ -1,0 +1,30 @@
+# Дополнение для разработки:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#
+# Открывает порты сервисов наружу, чтобы фронтенд (npm run dev), скрипты из
+# tools/ и psql можно было запускать прямо с машины разработчика.
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  api:
+    ports:
+      - "8000:8000"
+    environment:
+      LOG_LEVEL: DEBUG
+    command:
+      ["uvicorn", "app.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    volumes:
+      - ./backend/app:/app/app:ro
+      - ./backend/migrations:/app/migrations:ro
+
+  ingestor:
+    environment:
+      LOG_LEVEL: DEBUG
+    volumes:
+      - ./backend/app:/app/app:ro
+
+  grafana:
+    ports:
+      - "3000:3000"

@@ -1,0 +1,251 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1760" height="1100" viewBox="0 0 1760 1100" font-family="DejaVu Sans, Verdana, sans-serif">
+<rect width="1760" height="1100" fill="#ffffff"/>
+<text x="60.0" y="78.0" font-size="24" fill="#14181c" font-weight="bold">BinSense — принципиальная электрическая схема устройства</text>
+<text x="60.0" y="106.0" font-size="12" fill="#6b737b">Блоки соединены именами цепей: схема читается без проводов через весь лист, распиновка совпадает с hardware/WIRING.md.</text>
+<text x="60.0" y="128.0" font-size="12" fill="#6b737b">Номиналы и обозначения — из hardware/BOM.csv. Вариант с датчиком HC-SR04 — на листе 2.</text>
+<rect x="660.0" y="230.0" width="300.0" height="540.0" rx="4" fill="#f4f7f9" stroke="#14181c" stroke-width="2.2"/>
+<text x="810.0" y="256.0" font-size="16" fill="#14181c" text-anchor="middle" font-weight="bold">U1  NodeMCU (ESP8266)</text>
+<text x="810.0" y="274.0" font-size="11" fill="#6b737b" text-anchor="middle">или Wemos D1 mini</text>
+<path d="M 626.0 380.0 L 660.0 380.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="668.0" y="384.0" font-size="12" fill="#14181c">D3 / GPIO0</text>
+<path d="M 626.0 369.0 L 602.2 369.0 L 592.2 380.0 L 602.2 391.0 L 626.0 391.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="618.0" y="384.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">BTN</text>
+<text x="668.0" y="398.0" font-size="10" fill="#6b737b">кнопка FLASH</text>
+<path d="M 626.0 460.0 L 660.0 460.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="668.0" y="464.0" font-size="12" fill="#14181c">VIN</text>
+<path d="M 626.0 449.0 L 602.2 449.0 L 592.2 460.0 L 602.2 471.0 L 626.0 471.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="618.0" y="464.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">+5V</text>
+<text x="668.0" y="478.0" font-size="10" fill="#6b737b">5 В от USB</text>
+<path d="M 960.0 290.0 L 994.0 290.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="952.0" y="294.0" font-size="12" fill="#14181c" text-anchor="end">D5 / GPIO14</text>
+<path d="M 994.0 279.0 L 1048.2 279.0 L 1058.2 290.0 L 1048.2 301.0 L 994.0 301.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1002.0" y="294.0" font-size="12" fill="#0a6b4a" font-weight="bold">SENS_RX</text>
+<text x="952.0" y="308.0" font-size="10" fill="#6b737b" text-anchor="end">UART RX, белый</text>
+<path d="M 960.0 340.0 L 994.0 340.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="952.0" y="344.0" font-size="12" fill="#14181c" text-anchor="end">D6 / GPIO12</text>
+<path d="M 994.0 329.0 L 1048.2 329.0 L 1058.2 340.0 L 1048.2 351.0 L 994.0 351.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1002.0" y="344.0" font-size="12" fill="#0a6b4a" font-weight="bold">SENS_TX</text>
+<text x="952.0" y="358.0" font-size="10" fill="#6b737b" text-anchor="end">UART TX, жёлтый</text>
+<path d="M 960.0 420.0 L 994.0 420.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="952.0" y="424.0" font-size="12" fill="#14181c" text-anchor="end">D1 / GPIO5</text>
+<path d="M 994.0 409.0 L 1033.0 409.0 L 1043.0 420.0 L 1033.0 431.0 L 994.0 431.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1002.0" y="424.0" font-size="12" fill="#0a6b4a" font-weight="bold">LED_R</text>
+<text x="952.0" y="438.0" font-size="10" fill="#6b737b" text-anchor="end">красный канал</text>
+<path d="M 960.0 470.0 L 994.0 470.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="952.0" y="474.0" font-size="12" fill="#14181c" text-anchor="end">D2 / GPIO4</text>
+<path d="M 994.0 459.0 L 1033.0 459.0 L 1043.0 470.0 L 1033.0 481.0 L 994.0 481.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1002.0" y="474.0" font-size="12" fill="#0a6b4a" font-weight="bold">LED_G</text>
+<text x="952.0" y="488.0" font-size="10" fill="#6b737b" text-anchor="end">зелёный канал</text>
+<path d="M 960.0 520.0 L 994.0 520.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="952.0" y="524.0" font-size="12" fill="#14181c" text-anchor="end">D7 / GPIO13</text>
+<path d="M 994.0 509.0 L 1033.0 509.0 L 1043.0 520.0 L 1033.0 531.0 L 994.0 531.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1002.0" y="524.0" font-size="12" fill="#0a6b4a" font-weight="bold">LED_B</text>
+<text x="952.0" y="538.0" font-size="10" fill="#6b737b" text-anchor="end">синий канал</text>
+<path d="M 960.0 600.0 L 994.0 600.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="952.0" y="604.0" font-size="12" fill="#14181c" text-anchor="end">D8 / GPIO15</text>
+<path d="M 994.0 589.0 L 1025.4 589.0 L 1035.4 600.0 L 1025.4 611.0 L 994.0 611.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1002.0" y="604.0" font-size="12" fill="#0a6b4a" font-weight="bold">BUZZ</text>
+<text x="952.0" y="618.0" font-size="10" fill="#6b737b" text-anchor="end">база ключа зуммера</text>
+<path d="M 626.0 660.0 L 660.0 660.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="668.0" y="664.0" font-size="12" fill="#14181c">GND</text>
+<path d="M 596.0 660.0 L 596.0 676.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 580.0 676.0 L 612.0 676.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 586.0 682.0 L 606.0 682.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 591.0 688.0 L 601.0 688.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 596.0 660.0 L 626.0 660.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 626.0 720.0 L 660.0 720.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="668.0" y="724.0" font-size="12" fill="#14181c">3V3</text>
+<path d="M 596.0 720.0 L 626.0 720.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 596.0 720.0 L 596.0 704.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 582.0 704.0 L 610.0 704.0" fill="none" stroke="#14181c" stroke-width="2.4" stroke-linecap="round"/>
+<text x="596.0" y="696.0" font-size="12" fill="#0a6b4a" text-anchor="middle" font-weight="bold">+3.3 В</text>
+<text x="668.0" y="738.0" font-size="10" fill="#6b737b">стабилизатор платы, питает всю обвязку</text>
+<rect x="110.0" y="240.0" width="380.0" height="200.0" rx="6" fill="#fbfcfd" stroke="#6b737b" stroke-width="1.2" stroke-dasharray="6 5"/>
+<text x="126.0" y="264.0" font-size="13" fill="#14181c" font-weight="bold">Кнопка монтажника</text>
+<path d="M 250.0 286.0 L 250.0 270.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 236.0 270.0 L 264.0 270.0" fill="none" stroke="#14181c" stroke-width="2.4" stroke-linecap="round"/>
+<text x="250.0" y="262.0" font-size="12" fill="#0a6b4a" text-anchor="middle" font-weight="bold">+3.3 В</text>
+<path d="M 250.0 286.0 L 250.0 301.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<rect x="244.0" y="301.0" width="12.0" height="34.0" rx="0" fill="#ffffff" stroke="#14181c" stroke-width="1.6"/>
+<path d="M 250.0 335.0 L 250.0 350.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="262.0" y="313.0" font-size="13" fill="#0b5ea8" font-weight="bold">R1</text>
+<text x="262.0" y="328.0" font-size="12" fill="#7a4600">10 кОм, на плате</text>
+<path d="M 250.0 350.0 L 250.0 350.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<circle cx="250.0" cy="350.0" r="4.0" fill="#14181c"/>
+<path d="M 400.0 339.0 L 376.2 339.0 L 366.2 350.0 L 376.2 361.0 L 400.0 361.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="392.0" y="354.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">BTN</text>
+<path d="M 250.0 350.0 L 400.0 350.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 250.0 350.0 L 250.0 390.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 250.0 390.0 L 266.0 390.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 294.0 390.0 L 310.0 390.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 264.0 378.0 L 296.0 378.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 266.0 390.0 L 266.0 378.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 294.0 390.0 L 294.0 378.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 280.0 378.0 L 280.0 364.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 268.0 364.0 L 292.0 364.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<text x="280.0" y="416.0" font-size="13" fill="#0b5ea8" text-anchor="middle" font-weight="bold">SW1</text>
+<text x="280.0" y="431.0" font-size="12" fill="#7a4600" text-anchor="middle">6x6</text>
+<path d="M 310.0 390.0 L 310.0 408.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 310.0 408.0 L 310.0 424.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 294.0 424.0 L 326.0 424.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 300.0 430.0 L 320.0 430.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 305.0 436.0 L 315.0 436.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<text x="126.0" y="430.0" font-size="10" fill="#6b737b">На D1 mini кнопку ставят между D3 и GND</text>
+<rect x="110.0" y="470.0" width="380.0" height="210.0" rx="6" fill="#fbfcfd" stroke="#6b737b" stroke-width="1.2" stroke-dasharray="6 5"/>
+<text x="126.0" y="494.0" font-size="13" fill="#14181c" font-weight="bold">Питание от USB</text>
+<rect x="150.0" y="520.0" width="170.0" height="100.0" rx="4" fill="#f4f7f9" stroke="#14181c" stroke-width="2.2"/>
+<text x="235.0" y="546.0" font-size="16" fill="#14181c" text-anchor="middle" font-weight="bold">J1  micro-USB</text>
+<text x="235.0" y="564.0" font-size="11" fill="#6b737b" text-anchor="middle">зарядка 5 В, 1 А</text>
+<path d="M 320.0 555.0 L 354.0 555.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="312.0" y="559.0" font-size="12" fill="#14181c" text-anchor="end">VBUS</text>
+<path d="M 354.0 544.0 L 377.8 544.0 L 387.8 555.0 L 377.8 566.0 L 354.0 566.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="362.0" y="559.0" font-size="12" fill="#0a6b4a" font-weight="bold">+5V</text>
+<path d="M 320.0 595.0 L 354.0 595.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="312.0" y="599.0" font-size="12" fill="#14181c" text-anchor="end">GND</text>
+<path d="M 354.0 595.0 L 374.0 595.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 374.0 595.0 L 374.0 611.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 358.0 611.0 L 390.0 611.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 364.0 617.0 L 384.0 617.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 369.0 623.0 L 379.0 623.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<text x="126.0" y="650.0" font-size="10" fill="#6b737b">Разъём USB — на самой плате: кабель от зарядки</text>
+<text x="126.0" y="666.0" font-size="10" fill="#6b737b">телефона включается прямо в него.</text>
+<rect x="1030.0" y="240.0" width="670.0" height="250.0" rx="6" fill="#fbfcfd" stroke="#6b737b" stroke-width="1.2" stroke-dasharray="6 5"/>
+<text x="1046.0" y="264.0" font-size="13" fill="#14181c" font-weight="bold">Ультразвуковой датчик A02YYUW (UART)</text>
+<rect x="1470.0" y="290.0" width="190.0" height="180.0" rx="4" fill="#f4f7f9" stroke="#14181c" stroke-width="2.2"/>
+<text x="1565.0" y="316.0" font-size="16" fill="#14181c" text-anchor="middle" font-weight="bold">U2  A02YYUW</text>
+<text x="1565.0" y="334.0" font-size="11" fill="#6b737b" text-anchor="middle">влагозащищённый</text>
+<path d="M 1436.0 320.0 L 1470.0 320.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="1478.0" y="324.0" font-size="12" fill="#14181c">VCC</text>
+<path d="M 1436.0 360.0 L 1470.0 360.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="1478.0" y="364.0" font-size="12" fill="#14181c">GND</text>
+<path d="M 1436.0 400.0 L 1470.0 400.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="1478.0" y="404.0" font-size="12" fill="#14181c">RX жёлт.</text>
+<path d="M 1436.0 440.0 L 1470.0 440.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="1478.0" y="444.0" font-size="12" fill="#14181c">TX бел.</text>
+<path d="M 1400.0 320.0 L 1436.0 320.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1400.0 320.0 L 1400.0 304.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1386.0 304.0 L 1414.0 304.0" fill="none" stroke="#14181c" stroke-width="2.4" stroke-linecap="round"/>
+<text x="1400.0" y="296.0" font-size="12" fill="#0a6b4a" text-anchor="middle" font-weight="bold">+3.3 В</text>
+<path d="M 1436.0 360.0 L 1436.0 376.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1420.0 376.0 L 1452.0 376.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 1426.0 382.0 L 1446.0 382.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 1431.0 388.0 L 1441.0 388.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 1436.0 389.0 L 1381.8 389.0 L 1371.8 400.0 L 1381.8 411.0 L 1436.0 411.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1428.0" y="404.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">SENS_TX</text>
+<path d="M 1436.0 429.0 L 1381.8 429.0 L 1371.8 440.0 L 1381.8 451.0 L 1436.0 451.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1428.0" y="444.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">SENS_RX</text>
+<text x="1046.0" y="330.0" font-size="11" fill="#6b737b">Питание 3.3 В: при 5 В выход TX датчика</text>
+<text x="1046.0" y="348.0" font-size="11" fill="#6b737b">был бы выше допустимого для ESP8266.</text>
+<text x="1046.0" y="384.0" font-size="11" fill="#6b737b">Второго аппаратного UART у ESP8266 нет —</text>
+<text x="1046.0" y="402.0" font-size="11" fill="#6b737b">датчик читается программным на D5/D6.</text>
+<text x="1046.0" y="476.0" font-size="10" fill="#6b737b">Устройство работает от USB, поэтому датчик питается постоянно, без ключа.</text>
+<rect x="1030.0" y="510.0" width="670.0" height="200.0" rx="6" fill="#fbfcfd" stroke="#6b737b" stroke-width="1.2" stroke-dasharray="6 5"/>
+<text x="1046.0" y="534.0" font-size="13" fill="#14181c" font-weight="bold">Индикация: светодиод RGB с общим катодом</text>
+<path d="M 1098.0 563.0 L 1059.0 563.0 L 1049.0 574.0 L 1059.0 585.0 L 1098.0 585.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1090.0" y="578.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">LED_R</text>
+<path d="M 1098.0 574.0 L 1160.0 574.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1160.0 564.0 L 1160.0 569.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<rect x="1154.0" y="569.0" width="12.0" height="34.0" rx="0" fill="#ffffff" stroke="#14181c" stroke-width="1.6"/>
+<path d="M 1160.0 603.0 L 1160.0 608.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="1148.0" y="581.0" font-size="13" fill="#0b5ea8" text-anchor="end" font-weight="bold">R2</text>
+<text x="1148.0" y="596.0" font-size="12" fill="#7a4600" text-anchor="end">220 Ом</text>
+<path d="M 1160.0 608.0 L 1160.0 622.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1146.0 622.0 L 1174.0 622.0 L 1160.0 646.0 Z" fill="none" stroke="#14181c" stroke-width="1.8"/>
+<path d="M 1145.0 646.0 L 1175.0 646.0" fill="none" stroke="#14181c" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M 1160.0 646.0 L 1160.0 664.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1178.0 638.0 L 1191.0 625.0" fill="none" stroke="#14181c" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M 1191.0 625.0 l -6 1 l 5 4 Z" fill="#14181c"/>
+<path d="M 1187.0 632.0 L 1200.0 619.0" fill="none" stroke="#14181c" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M 1200.0 619.0 l -6 1 l 5 4 Z" fill="#14181c"/>
+<text x="1204.0" y="632.0" font-size="13" fill="#0b5ea8" font-weight="bold">D1</text>
+<text x="1204.0" y="647.0" font-size="12" fill="#7a4600">красный</text>
+<path d="M 1160.0 664.0 L 1160.0 666.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1268.0 563.0 L 1229.0 563.0 L 1219.0 574.0 L 1229.0 585.0 L 1268.0 585.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1260.0" y="578.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">LED_G</text>
+<path d="M 1268.0 574.0 L 1330.0 574.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1330.0 564.0 L 1330.0 569.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<rect x="1324.0" y="569.0" width="12.0" height="34.0" rx="0" fill="#ffffff" stroke="#14181c" stroke-width="1.6"/>
+<path d="M 1330.0 603.0 L 1330.0 608.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="1318.0" y="581.0" font-size="13" fill="#0b5ea8" text-anchor="end" font-weight="bold">R3</text>
+<text x="1318.0" y="596.0" font-size="12" fill="#7a4600" text-anchor="end">220 Ом</text>
+<path d="M 1330.0 608.0 L 1330.0 622.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1316.0 622.0 L 1344.0 622.0 L 1330.0 646.0 Z" fill="none" stroke="#14181c" stroke-width="1.8"/>
+<path d="M 1315.0 646.0 L 1345.0 646.0" fill="none" stroke="#14181c" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M 1330.0 646.0 L 1330.0 664.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1348.0 638.0 L 1361.0 625.0" fill="none" stroke="#14181c" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M 1361.0 625.0 l -6 1 l 5 4 Z" fill="#14181c"/>
+<path d="M 1357.0 632.0 L 1370.0 619.0" fill="none" stroke="#14181c" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M 1370.0 619.0 l -6 1 l 5 4 Z" fill="#14181c"/>
+<text x="1374.0" y="632.0" font-size="13" fill="#0b5ea8" font-weight="bold">D1</text>
+<text x="1374.0" y="647.0" font-size="12" fill="#7a4600">зелёный</text>
+<path d="M 1330.0 664.0 L 1330.0 666.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1438.0 563.0 L 1399.0 563.0 L 1389.0 574.0 L 1399.0 585.0 L 1438.0 585.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1430.0" y="578.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">LED_B</text>
+<path d="M 1438.0 574.0 L 1500.0 574.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1500.0 564.0 L 1500.0 569.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<rect x="1494.0" y="569.0" width="12.0" height="34.0" rx="0" fill="#ffffff" stroke="#14181c" stroke-width="1.6"/>
+<path d="M 1500.0 603.0 L 1500.0 608.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="1488.0" y="581.0" font-size="13" fill="#0b5ea8" text-anchor="end" font-weight="bold">R4</text>
+<text x="1488.0" y="596.0" font-size="12" fill="#7a4600" text-anchor="end">220 Ом</text>
+<path d="M 1500.0 608.0 L 1500.0 622.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1486.0 622.0 L 1514.0 622.0 L 1500.0 646.0 Z" fill="none" stroke="#14181c" stroke-width="1.8"/>
+<path d="M 1485.0 646.0 L 1515.0 646.0" fill="none" stroke="#14181c" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M 1500.0 646.0 L 1500.0 664.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1518.0 638.0 L 1531.0 625.0" fill="none" stroke="#14181c" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M 1531.0 625.0 l -6 1 l 5 4 Z" fill="#14181c"/>
+<path d="M 1527.0 632.0 L 1540.0 619.0" fill="none" stroke="#14181c" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M 1540.0 619.0 l -6 1 l 5 4 Z" fill="#14181c"/>
+<text x="1544.0" y="632.0" font-size="13" fill="#0b5ea8" font-weight="bold">D1</text>
+<text x="1544.0" y="647.0" font-size="12" fill="#7a4600">синий</text>
+<path d="M 1500.0 664.0 L 1500.0 666.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1160.0 666.0 L 1500.0 666.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1330.0 666.0 L 1330.0 682.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1314.0 682.0 L 1346.0 682.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 1320.0 688.0 L 1340.0 688.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 1325.0 694.0 L 1335.0 694.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="1160.0" cy="666.0" r="4.0" fill="#14181c"/>
+<circle cx="1500.0" cy="666.0" r="4.0" fill="#14181c"/>
+<text x="1046.0" y="698.0" font-size="10" fill="#6b737b">Ток канала 5–7 мА: светодиод хорошо виден снаружи корпуса.</text>
+<rect x="1030.0" y="730.0" width="670.0" height="200.0" rx="6" fill="#fbfcfd" stroke="#6b737b" stroke-width="1.2" stroke-dasharray="6 5"/>
+<text x="1046.0" y="754.0" font-size="13" fill="#14181c" font-weight="bold">Зуммер подтверждения при монтаже</text>
+<path d="M 1140.0 835.0 L 1108.6 835.0 L 1098.6 846.0 L 1108.6 857.0 L 1140.0 857.0 Z" fill="#eef6f2" stroke="#0a6b4a" stroke-width="1.2"/>
+<text x="1132.0" y="850.0" font-size="12" fill="#0a6b4a" text-anchor="end" font-weight="bold">BUZZ</text>
+<path d="M 1150.0 846.0 L 1163.0 846.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<rect x="1163.0" y="840.0" width="34.0" height="12.0" rx="0" fill="#ffffff" stroke="#14181c" stroke-width="1.6"/>
+<path d="M 1197.0 846.0 L 1210.0 846.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="1180.0" y="820.0" font-size="13" fill="#0b5ea8" text-anchor="middle" font-weight="bold">R5</text>
+<text x="1180.0" y="835.0" font-size="12" fill="#7a4600" text-anchor="middle">1 кОм</text>
+<path d="M 1210.0 846.0 L 1256.0 846.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1256.0 820.0 L 1256.0 872.0" fill="none" stroke="#14181c" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M 1256.0 834.0 L 1290.0 800.0 L 1290.0 788.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1256.0 858.0 L 1290.0 892.0 L 1290.0 904.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1276.0 870.0 L 1288.0 886.0 L 1270.0 884.0 Z" fill="#14181c"/>
+<text x="1304.0" y="842.0" font-size="13" fill="#0b5ea8" font-weight="bold">Q1</text>
+<text x="1304.0" y="857.0" font-size="12" fill="#7a4600">S8050</text>
+<path d="M 1290.0 904.0 L 1290.0 920.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1274.0 920.0 L 1306.0 920.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 1280.0 926.0 L 1300.0 926.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M 1285.0 932.0 L 1295.0 932.0" fill="none" stroke="#14181c" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="1446.0" cy="836.0" r="22" fill="none" stroke="#14181c" stroke-width="1.8"/>
+<path d="M 1446.0 814.0 L 1446.0 796.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1446.0 858.0 L 1446.0 876.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1430.0 836.0 L 1462.0 836.0" fill="none" stroke="#14181c" stroke-width="1.4" stroke-linecap="round"/>
+<text x="1474.0" y="832.0" font-size="13" fill="#0b5ea8" font-weight="bold">BZ1</text>
+<text x="1474.0" y="847.0" font-size="12" fill="#7a4600">3.3 В активный</text>
+<path d="M 1290.0 788.0 L 1290.0 876.0 L 1446.0 876.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1446.0 796.0 L 1446.0 780.0" fill="none" stroke="#14181c" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M 1432.0 780.0 L 1460.0 780.0" fill="none" stroke="#14181c" stroke-width="2.4" stroke-linecap="round"/>
+<text x="1446.0" y="772.0" font-size="12" fill="#0a6b4a" text-anchor="middle" font-weight="bold">+3.3 В</text>
+<text x="1046.0" y="918.0" font-size="10" fill="#6b737b">D8 при включении притянут к земле — зуммер не пищит, пока прошивка не запустилась.</text>
+<rect x="20.0" y="20.0" width="1720.0" height="1060.0" rx="0" fill="none" stroke="#14181c" stroke-width="2.2"/>
+<rect x="1280.0" y="968.0" width="460.0" height="112.0" rx="0" fill="#ffffff" stroke="#14181c" stroke-width="2.0"/>
+<path d="M 1280.0 1006.0 L 1740.0 1006.0" fill="none" stroke="#14181c" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M 1280.0 1042.0 L 1740.0 1042.0" fill="none" stroke="#14181c" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M 1580.0 968.0 L 1580.0 1080.0" fill="none" stroke="#14181c" stroke-width="1.2" stroke-linecap="round"/>
+<text x="1292.0" y="994.0" font-size="15" fill="#14181c" font-weight="bold">Принципиальная электрическая схема</text>
+<text x="1292.0" y="1030.0" font-size="12" fill="#6b737b">BinSense — мониторинг заполненности контейнеров</text>
+<text x="1292.0" y="1066.0" font-size="11" fill="#6b737b">Источник: hardware/WIRING.md, hardware/BOM.csv</text>
+<text x="1592.0" y="994.0" font-size="13" fill="#14181c" font-weight="bold">Лист 1 из 2 · основная сборка</text>
+<text x="1592.0" y="1030.0" font-size="12" fill="#6b737b">Учебный проект</text>
+<text x="1592.0" y="1066.0" font-size="11" fill="#6b737b">Схему генерирует make_schematic.py</text>
+</svg>

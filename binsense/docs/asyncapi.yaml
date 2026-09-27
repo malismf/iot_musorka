@@ -1,0 +1,290 @@
+asyncapi: 2.6.0
+
+info:
+  title: BinSense — обмен с устройствами по MQTT
+  version: 1.0.0
+  description: |
+    Протокол между датчиком заполненности контейнера и сервером BinSense.
+
+    Операции описаны со стороны **сервера**: `publish` — то, что сервер
+    отправляет устройству, `subscribe` — то, что он получает от устройства.
+
+    Особенности:
+      * настройки уходят устройству retained-сообщением: устройство получает
+        последнюю версию сразу после подписки, даже если её поменяли, пока
+        оно было без связи;
+      * телеметрия и события публикуются с QoS 1 — устройство считает данные
+        отправленными только после подтверждения брокера;
+      * Last Will не используется: статус «нет связи»
+        вычисляет сервер по времени последнего сообщения.
+  license:
+    name: MIT
+
+servers:
+  production:
+    url: bins.example.com:1883
+    protocol: mqtt
+    description: Mosquitto с плагином dynamic-security
+    security:
+      - devicePassword: []
+  tls:
+    url: bins.example.com:8883
+    protocol: secure-mqtt
+    description: Тот же брокер с TLS (необязательный вариант, см. docs/DEPLOY.md)
+    security:
+      - devicePassword: []
+
+defaultContentType: application/json
+
+channels:
+  bins/{deviceId}/telemetry:
+    description: Регулярные измерения. Устройство публикует, сервер читает.
+    parameters:
+      deviceId:
+        $ref: '#/components/parameters/deviceId'
+    subscribe:
+      operationId: receiveTelemetry
+      bindings:
+        mqtt:
+          qos: 1
+          retain: false
+      message:
+        $ref: '#/components/messages/Telemetry'
+
+  bins/{deviceId}/event:
+    description: Разовые события устройства (калибровка, ошибки, включение).
+    parameters:
+      deviceId:
+        $ref: '#/components/parameters/deviceId'
+    subscribe:
+      operationId: receiveEvent
+      bindings:
+        mqtt:
+          qos: 1
+          retain: false
+      message:
+        $ref: '#/components/messages/DeviceEvent'
+
+  bins/{deviceId}/config:
+    description: |
+      Настройки устройства. Публикуются сервером с флагом retain: устройство
+      подписывается после пробуждения и сразу получает актуальную версию.
+      Применённую версию оно возвращает в поле `cfg_ver` телеметрии.
+    parameters:
+      deviceId:
+        $ref: '#/components/parameters/deviceId'
+    publish:
+      operationId: sendConfig
+      bindings:
+        mqtt:
+          qos: 1
+          retain: true
+      message:
+        $ref: '#/components/messages/Config'
+
+components:
+  parameters:
+    deviceId:
+      description: Идентификатор устройства, `bin-` и последние три байта MAC-адреса
+      schema:
+        type: string
+        pattern: '^bin-[0-9a-f]{6}$'
+        examples:
+          - bin-a1b2c3
+
+  securitySchemes:
+    devicePassword:
+      type: userPassword
+      description: |
+        У каждого устройства своя учётная запись (логин совпадает с
+        идентификатором) и роль в dynamic-security, разрешающая писать только
+        в `bins/<id>/telemetry` и `bins/<id>/event` и читать `bins/<id>/config`.
+        Учётные данные выдаёт сервер при подготовке устройства.
+
+  messages:
+    Telemetry:
+      name: telemetry
+      title: Измерение
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/Telemetry'
+      examples:
+        - name: обычный замер по таймеру
+          payload:
+            seq: 1532
+            boot: 884213
+            ts: 1790000000
+            fill: 72
+            dist_mm: 454
+            rssi: -67
+            wake: timer
+            wifi_ms: 1210
+            mqtt_ms: 260
+            fw: 2.0.0
+            hw: esp8266-a02yyuw
+            cfg_ver: 3
+
+    DeviceEvent:
+      name: event
+      title: Событие устройства
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/DeviceEvent'
+      examples:
+        - name: калибровка выполнена
+          payload:
+            type: calibrated
+            empty_mm: 982
+            full_mm: 250
+        - name: датчик не отвечает
+          payload:
+            type: error
+            code: SENSOR_TIMEOUT
+        - name: устройство включено
+          payload:
+            type: hello
+            fw: 2.0.0
+            hw: esp8266-a02yyuw
+            reset: POWERON
+
+    Config:
+      name: config
+      title: Настройки устройства
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/Config'
+      examples:
+        - name: рабочие настройки
+          payload:
+            ver: 3
+            claimed: true
+            interval_s: 900
+            heartbeat_s: 7200
+            full_interval_s: 300
+            night_interval_s: 1800
+            night: [23, 7]
+            tz: MSK-3
+            full_pct: 80
+            delta_pct: 3
+            samples: 7
+            empty_mm: 982
+            full_mm: 250
+
+  schemas:
+    Telemetry:
+      type: object
+      required: [seq, boot]
+      properties:
+        seq:
+          type: integer
+          description: Счётчик сообщений с момента включения; по разрывам считаются потери
+        boot:
+          type: integer
+          description: Случайный идентификатор включения — отличает перезагрузку от потери
+        ts:
+          type: integer
+          description: Unix-время измерения по часам устройства (после синхронизации по NTP)
+        fill:
+          type: [integer, 'null']
+          minimum: 0
+          maximum: 100
+          description: Заполненность в процентах; null, если устройство не откалибровано
+        dist_mm:
+          type: integer
+          description: Расстояние до поверхности мусора, мм (медиана нескольких замеров)
+        rssi:
+          type: integer
+          description: Уровень сигнала Wi-Fi, dBm
+        wake:
+          type: string
+          enum: [timer, button, boot, setup]
+        wifi_ms:
+          type: integer
+          description: Сколько заняло последнее подключение к Wi-Fi, мс
+        mqtt_ms:
+          type: integer
+          description: Сколько заняло последнее подключение к брокеру, мс
+        fw:
+          type: string
+        hw:
+          type: string
+        cfg_ver:
+          type: integer
+          description: Версия применённых настроек
+        reset:
+          type: string
+          description: Причина последней перезагрузки (только в первом сообщении после включения)
+
+    DeviceEvent:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [calibrated, error, hello]
+        code:
+          type: string
+          description: Код ошибки, например SENSOR_TIMEOUT или CALIBRATION_FAILED
+        empty_mm:
+          type: integer
+          description: Расстояние до дна пустого контейнера (результат калибровки)
+        full_mm:
+          type: integer
+        fw:
+          type: string
+        hw:
+          type: string
+        reset:
+          type: string
+        lat:
+          type: number
+          description: Координаты от GPS-модуля, если он установлен на время монтажа
+        lon:
+          type: number
+
+    Config:
+      type: object
+      required: [ver]
+      properties:
+        ver:
+          type: integer
+          description: Версия настроек; устройство применяет только более новую
+        claimed:
+          type: boolean
+          description: Привязано ли устройство к аккаунту (влияет на индикацию)
+        interval_s:
+          type: integer
+          description: Обычный интервал измерений, с
+        heartbeat_s:
+          type: integer
+          description: Максимальный интервал между отправками, с
+        full_interval_s:
+          type: integer
+          description: Интервал, когда контейнер заполнен
+        night_interval_s:
+          type: integer
+        night:
+          type: array
+          items:
+            type: integer
+          minItems: 2
+          maxItems: 2
+          description: Часы ночного режима, [начало, конец]
+        tz:
+          type: string
+          description: Часовой пояс в формате POSIX TZ, например MSK-3
+        full_pct:
+          type: integer
+          description: Порог «контейнер заполнен», %
+        delta_pct:
+          type: integer
+          description: Насколько должна измениться заполненность, чтобы отправить данные
+        samples:
+          type: integer
+          description: Сколько замеров усреднять медианой
+        empty_mm:
+          type: integer
+          description: "Калибровка: расстояние до дна пустого контейнера"
+        full_mm:
+          type: integer
+          description: Расстояние, которое считается 100 %
